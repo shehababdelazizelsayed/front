@@ -1,0 +1,8 @@
+.hero-section {
+  padding-top: 70px; /* To account for the fixed navbar */
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+}

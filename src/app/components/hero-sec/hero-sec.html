@@ -1,0 +1,87 @@
+<section class="hero-section position-relative">
+  <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-hero"></div>
+
+  <div
+    *ngFor="let book of heroBooks; let i = index"
+    class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+    [style.opacity]="i === currentSlide ? 1 : 0"
+    [style.transition]="'opacity 1s ease-in-out'"
+  >
+    <div class="position-relative">
+      <img [src]="book.image" [alt]="book.title" class="hero-image animate-float" />
+    </div>
+  </div>
+
+  <div
+    class="position-absolute bottom-0 start-50 translate-middle-x text-center mb-5 pb-5 animate-fade-in"
+    style="z-index: 10"
+  >
+    <h2 class="display-1 fw-bold mb-3" style="letter-spacing: 0.1em">
+      {{ heroBooks[currentSlide].title }}
+    </h2>
+    <p class="fs-4 text-muted-custom mb-4">
+      {{ heroBooks[currentSlide].subtitle }}
+    </p>
+    <div class="d-flex align-items-center justify-content-center gap-4">
+      <span class="display-5 fw-bold text-accent">
+        {{ heroBooks[currentSlide].price }}
+      </span>
+      <button class="btn btn-accent btn-lg">Add to Cart</button>
+    </div>
+  </div>
+
+  <button
+    (click)="prevSlide()"
+    class="btn position-absolute top-50 start-0 translate-middle-y ms-4 rounded-circle bg-white bg-opacity-50"
+    style="width: 48px; height: 48px; z-index: 20; backdrop-filter: blur(8px)"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+  </button>
+
+  <button
+    (click)="nextSlide()"
+    class="btn position-absolute top-50 end-0 translate-middle-y me-4 rounded-circle bg-white bg-opacity-50"
+    style="width: 48px; height: 48px; z-index: 20; backdrop-filter: blur(8px)"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  </button>
+
+  <div
+    class="position-absolute bottom-0 start-50 translate-middle-x d-flex gap-2 mb-3"
+    style="z-index: 20"
+  >
+    <button
+      *ngFor="let book of heroBooks; let i = index"
+      (click)="goToSlide(i)"
+      class="border-0 rounded-pill"
+      [style.width]="i === currentSlide ? '48px' : '8px'"
+      [style.height]="'8px'"
+      [style.background]="i === currentSlide ? 'var(--bs-primary)' : 'var(--bs-muted)'"
+      [style.transition]="'all 0.3s ease'"
+    ></button>
+  </div>
+</section>
