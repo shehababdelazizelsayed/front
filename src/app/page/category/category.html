@@ -5,35 +5,42 @@
   <app-nav></app-nav>
 
   <main class="container" style="padding-top: 120px; padding-bottom: 80px">
-    <div class="mb-5">
+    <div class="mb-5 text-center text-lg-start">
       <h1 class="display-4 fw-bold mb-3">All Books</h1>
       <p class="fs-5 text-muted-custom">Discover our complete collection</p>
     </div>
 
     <div class="row g-4">
       <!-- Filters Sidebar -->
-      <aside class="col-lg-3">
-        <div class="card shadow-lg border">
+      <div class="col-lg-3">
+        <aside class="card shadow-lg border">
           <div class="card-body">
             <h3 class="h5 fw-semibold mb-4">Filters</h3>
 
             <div class="mb-4">
               <label class="form-label fw-medium">Category</label>
-              <select [(ngModel)]="selectedCategory" class="form-select">
+              <select
+                [(ngModel)]="selectedCategory"
+                (ngModelChange)="onCategoryChange($event)"
+                class="form-select"
+              >
                 <option value="all">All Categories</option>
-                <option *ngFor="let cat of categories.slice(1)" [value]="cat">
-                  {{ cat | titlecase }}
+                <option *ngFor="let cat of categories.slice(1)" [value]="cat.toLowerCase()">
+                  {{ cat }}
                 </option>
               </select>
             </div>
 
             <div class="mb-4">
               <label class="form-label fw-medium">Sort By</label>
-              <select [(ngModel)]="selectedSort" class="form-select">
-                <option value="featured">Featured</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="newest">Newest</option>
+              <select
+                [(ngModel)]="selectedSort"
+                (ngModelChange)="onSortChange()"
+                class="form-select"
+              >
+                <option *ngFor="let option of sortOptions" [value]="option.value">
+                  {{ option.label }}
+                </option>
               </select>
             </div>
 
@@ -42,18 +49,28 @@
               <div class="d-grid gap-2">
                 <button
                   *ngFor="let range of priceRanges"
-                  (click)="selectedPrice = range"
+                  (click)="onPriceRangeChange(range)"
                   [class.btn-primary]="selectedPrice === range"
                   [class.btn-outline-secondary]="selectedPrice !== range"
                   class="btn text-start"
                 >
-                  ${{ range.replace('-', ' - $').replace('+', '+') }}
+                  {{
+                    range === 'all'
+                      ? 'All Prices'
+                      : range === 'under-15'
+                      ? 'Under $15'
+                      : range === '15-30'
+                      ? '$15 - $30'
+                      : range === '30-50'
+                      ? '$30 - $50'
+                      : 'Over $50'
+                  }}
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      </aside>
+        </aside>
+      </div>
 
       <!-- Books Grid -->
       <div class="col-lg-9">

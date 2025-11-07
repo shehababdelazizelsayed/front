@@ -1,0 +1,17 @@
+<section class="container py-5" id="categories">
+  <div class="text-center mb-5">
+    <h2 class="display-5 fw-bold mb-3">Explore Genres</h2>
+    <p class="text-muted-custom fs-5 mb-0">Find your next favorite book by genre</p>
+  </div>
+
+  <div class="d-flex flex-wrap justify-content-center gap-4">
+    <div
+      class="genre-box text-center p-4"
+      *ngFor="let category of categories"
+      (click)="navigateToCategory(category.name)"
+    >
+      <h4 class="fw-semibold mb-2">{{ category.name }}</h4>
+      <p class="mb-0 small text-muted-custom">{{ category.count }} books</p>
+    </div>
+  </div>
+</section>

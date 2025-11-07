@@ -1,0 +1,43 @@
+/* Genre Section */
+#categories {
+  text-align: center;
+}
+
+/* Genre Cards */
+.genre-box {
+  background: var(--gradient-card);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  width: 180px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 16px rgba(26, 26, 46, 0.05);
+}
+
+.genre-box:hover {
+  transform: translateY(-6px);
+  background: white;
+  border-color: var(--bs-primary);
+  box-shadow: 0 8px 24px rgba(var(--bs-primary-rgb), 0.2);
+}
+
+.genre-box h4 {
+  color: var(--bs-body-color);
+  transition: color 0.3s ease;
+}
+
+.genre-box:hover h4 {
+  color: var(--bs-primary);
+}
+
+.genre-box p {
+  color: var(--bs-muted);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .genre-box {
+    width: 140px;
+    padding: 1rem;
+  }
+}

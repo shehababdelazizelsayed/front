@@ -18,7 +18,6 @@ export class BookCard {
   @Input() book!: Book;
 
   protected addToCart() {
-    // TODO: Implement cart functionality
     console.log('Adding to cart:', this.book.title);
   }
 }

@@ -37,6 +37,7 @@ body {
   color: var(--bs-body-color);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top: 3rem;
 }
 
 h1,

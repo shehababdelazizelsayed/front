@@ -14,9 +14,27 @@ import { Category } from './page/category/category';
 import { Login } from './page/login/login';
 import { Cart } from './page/cart/cart';
 import { Profile } from './page/profile/profile';
+import { Cat } from './components/cat/cat';
+import { Footer } from './components/footer/footer';
+import { Register } from './page/register/register';
+import { Forget } from './page/forget/forget';
 
 @NgModule({
-  declarations: [App, Nav, BookCard, HeroSec, HomeComponent, Category, Profile, Cart, Login],
+  declarations: [
+    App,
+    Nav,
+    BookCard,
+    HeroSec,
+    HomeComponent,
+    Category,
+    Profile,
+    Cart,
+    Login,
+    Cat,
+    Footer,
+    Register,
+    Forget,
+  ],
   imports: [BrowserModule, CommonModule, AppRoutingModule, FormsModule, RouterModule],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],

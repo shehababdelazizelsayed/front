@@ -1,0 +1,199 @@
+.navbar-dark-custom {
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-brand-custom {
+  color: #ffffff !important;
+  letter-spacing: 2px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-pills-container {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link-custom {
+  color: rgba(255, 255, 255, 0.6) !important;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  min-width: 70px;
+  border-radius: 30px;
+}
+
+.nav-link-custom:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.nav-link-custom.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.btn-icon-custom {
+  width: 40px;
+  height: 40px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.btn-icon-custom:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.btn-login-custom {
+  transition: all 0.3s ease;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+}
+
+.btn-login-custom:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px);
+}
+
+.navbar-brand-custom:hover {
+  opacity: 0.8;
+}
+
+.navbar-toggler-custom {
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.navbar-toggler-custom:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.navbar-toggler-custom .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+.search-container {
+  position: fixed;
+  top: 90px;
+  left: 70%;
+  transform: translateX(-50%) scale(0.8);
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  border-radius: 50px;
+  transition: all 0.4s ease;
+  z-index: 1050;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+  padding: 0.6rem 1.2rem;
+}
+
+.search-container.active {
+  width: 400px;
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-container.active .search-input {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.search-input:focus {
+  outline: none !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+  transition: box-shadow 0.2s ease;
+}
+
+.navbar-brand::after {
+  border-left: 3px solid white;
+  height: 200px;
+}
+
+.navbar-brand-custom::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 150px; /* width controls curve depth */
+  height: 150px; /* height controls arc length */
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  border-left: none; /* hide left side */
+  border-bottom: none; /* hide bottom if needed */
+  border-radius: 0 0 100% 0; /* curves the line rightward */
+  transform: rotate(10deg);
+}
+
+/* Reverse mirror version (before) */
+.navbar-brand::before {
+  border-left: 3px solid white;
+  height: 200px;
+}
+
+.navbar-brand-custom::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: -40px; /* mirror horizontally */
+  width: 150px;
+  height: 150px;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  border-right: none; /* opposite of after */
+  border-bottom: none;
+  border-radius: 0 0 0 100%; /* mirror the curve */
+  transform: rotate(-10deg); /* opposite angle */
+}
+
+@media (max-width: 992px) {
+  .navbar-brand-custom {
+    position: static;
+    transform: none;
+  }
+}
+
+.navbar-brand-custom:hover::before,
+.navbar-brand-custom:hover::after {
+  border-color: #fff;
+  transition: border-color 0.3s ease;
+}

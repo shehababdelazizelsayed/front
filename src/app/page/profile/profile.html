@@ -2,8 +2,6 @@
   class="min-vh-100"
   style="background: linear-gradient(to bottom, var(--bs-body-bg), var(--bs-secondary))"
 >
-  <app-nav></app-nav>
-
   <main class="container" style="padding-top: 120px; padding-bottom: 80px">
     <div style="max-width: 1000px; margin: 0 auto">
       <div class="mb-5">
@@ -115,16 +113,6 @@
           <p class="text-muted-custom small mb-0">Update your personal details</p>
         </div>
         <div class="card-body">
-          <div class="d-flex align-items-center gap-3 mb-4">
-            <div
-              class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
-              style="width: 96px; height: 96px; background: var(--gradient-accent); font-size: 2rem"
-            >
-              JD
-            </div>
-            <button class="btn btn-outline-secondary">Change Avatar</button>
-          </div>
-
           <form (ngSubmit)="saveProfile()">
             <div class="row g-3 mb-3">
               <div class="col-md-6">
@@ -157,6 +145,16 @@
               <input type="tel" class="form-control" [(ngModel)]="profile.phone" name="phone" />
             </div>
 
+            <div class="mb-4">
+              <label class="form-label">Role</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="profile.Role"
+                name="Role"
+                readonly
+              />
+            </div>
             <button type="submit" class="btn btn-primary">Save Changes</button>
           </form>
         </div>
@@ -222,60 +220,179 @@
           <p class="text-muted-custom small mb-0">Manage your account preferences</p>
         </div>
         <div class="card-body">
-          <div class="mb-5">
-            <h3 class="h6 fw-semibold mb-3">Notifications</h3>
-            <div class="d-grid gap-3">
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="small">Email notifications</span>
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [(ngModel)]="notifications.email"
-                  />
-                </div>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="small">SMS notifications</span>
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" [(ngModel)]="notifications.sms" />
-                </div>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="small">Order updates</span>
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [(ngModel)]="notifications.orders"
-                  />
-                </div>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="small">Marketing emails</span>
-                <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [(ngModel)]="notifications.marketing"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div>
             <h3 class="h6 fw-semibold mb-3">Security</h3>
             <div class="d-grid gap-2">
-              <button class="btn btn-outline-secondary text-start">Change Password</button>
-              <button class="btn btn-outline-secondary text-start">
+              <button
+                type="button"
+                class="btn btn-outline-secondary text-start"
+                (click)="openModal()"
+              >
+                Change Password
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-outline-secondary text-start"
+                (click)="openTwoFactorModal()"
+              >
                 Two-Factor Authentication
               </button>
-              <button class="btn btn-outline-danger text-start">Delete Account</button>
+              <button class="btn btn-outline-danger text-start" (click)="openDeleteModal()">
+                Delete Account
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </main>
+</div>
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Password</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="changePassword()">
+          <div class="mb-3">
+            <label for="currentPassword" class="form-label">Current Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="currentPassword"
+              [(ngModel)]="currentPassword"
+              name="currentPassword"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="newPassword"
+              [(ngModel)]="newPassword"
+              name="newPassword"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              name="confirmPassword"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="passwordToast" class="toast align-items-center text-bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">Password changed successfully!</div>
+      <button
+        type="button"
+        class="btn-close btn-close-white me-2 m-auto"
+        data-bs-dismiss="toast"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<!-- 2FA Modal -->
+<div class="modal fade" id="twoFactorModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Two-Factor Authentication</h5>
+        <button type="button" class="btn-close" (click)="closeTwoFactorModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          Add an extra layer of security to your account. When enabled, you’ll be asked for a
+          verification code in addition to your password when signing in.
+        </p>
+
+        <div *ngIf="!isTwoFactorEnabled; else disable2fa">
+          <form (ngSubmit)="enableTwoFactor()">
+            <div class="mb-3">
+              <label for="phoneNumber" class="form-label">Phone Number</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                class="form-control"
+                [(ngModel)]="twoFactorPhone"
+                name="phoneNumber"
+                placeholder="+20 1023323888"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Enable 2FA</button>
+          </form>
+        </div>
+
+        <ng-template #disable2fa>
+          <div class="text-center">
+            <p class="fw-semibold mb-3 text-success">
+              Two-Factor Authentication is currently <strong>enabled</strong>.
+            </p>
+            <button class="btn btn-outline-danger w-100" (click)="disableTwoFactor()">
+              Disable 2FA
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Delete Account</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeDeleteModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          ⚠️ Are you absolutely sure you want to <strong>delete your account</strong>? This action
+          <strong>cannot be undone</strong>.
+        </p>
+        <div class="form-check mb-3">
+          <input
+            type="checkbox"
+            id="confirmDelete"
+            class="form-check-input"
+            [(ngModel)]="confirmDelete"
+          />
+          <label for="confirmDelete" class="form-check-label">
+            I understand the consequences.
+          </label>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary" (click)="closeDeleteModal()">Cancel</button>
+          <button class="btn btn-danger" [disabled]="!confirmDelete" (click)="deleteAccount()">
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
