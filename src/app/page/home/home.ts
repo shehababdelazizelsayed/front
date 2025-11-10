@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Book } from '../../components/book-card/book-card';
+import { Api } from '../../services/api';
+
 
 @Component({
   selector: 'app-home',
@@ -7,35 +9,42 @@ import { Book } from '../../components/book-card/book-card';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
+
+
 export class HomeComponent {
-  protected featuredBooks: Book[] = [
-    {
-      title: 'The Art of Programming',
-      author: 'John Smith',
-      genre: 'Technology',
-      price: '$49.99',
-      image: '/assets/books/book1.jpg',
-    },
-    {
-      title: 'Digital Dreams',
-      author: 'Sarah Johnson',
-      genre: 'Science Fiction',
-      price: '$39.99',
-      image: '/assets/books/book2.jpg',
-    },
-    {
-      title: 'Web Development Mastery',
-      author: 'Michael Brown',
-      genre: 'Education',
-      price: '$44.99',
-      image: '/assets/books/book3.jpg',
-    },
-    {
-      title: 'The Future of AI',
-      author: 'Emily Chen',
-      genre: 'Technology',
-      price: '$54.99',
-      image: '/assets/books/book4.jpg',
-    },
-  ];
+  featuredBooks: Book[] = [];
+  loading = false;
+  errorMessage = '';
+
+  constructor(private api: Api) { }
+
+  ngOnInit(): void {
+    this.fetchBooks();
+  }
+
+  fetchBooks(): void {
+    this.loading = true;
+
+    this.api.DisplayHome().subscribe({
+      next: (response) => {
+
+        this.featuredBooks = response.books.map((b: any) => ({
+          id: b._id,
+          title: b.Title,
+          author: b.Author,
+          genre: b.Genre || 'Unknown',
+          price: b.Price,
+          description: b.Description,
+          image: b.Image || 'assets/books/default.jpg',
+        }));
+
+
+        this.loading = false;
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to load books';
+        this.loading = false;
+      },
+    });
+  }
 }

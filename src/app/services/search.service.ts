@@ -43,21 +43,21 @@ export class SearchService {
         (book) =>
           book.title.toLowerCase().includes(query) ||
           book.author.toLowerCase().includes(query) ||
-          book.genre.toLowerCase().includes(query)
+          book.Category.toLowerCase().includes(query)
       );
     }
 
     // Apply category filter
     if (filters.category && filters.category !== 'all') {
       filtered = filtered.filter(
-        (book) => book.genre.toLowerCase() === (filters.category?.toLowerCase() ?? '')
+        (book) => book.Category.toLowerCase() === (filters.category?.toLowerCase() ?? '')
       );
     }
 
     // Apply price range filter
     if (filters.priceRange) {
       filtered = filtered.filter((book) => {
-        const price = parseFloat(book.price.replace('$', ''));
+        const price = book.price;
         switch (filters.priceRange) {
           case 'under-15':
             return price < 15;
@@ -76,8 +76,8 @@ export class SearchService {
     // Apply sorting
     if (filters.sortBy) {
       filtered.sort((a, b) => {
-        const priceA = parseFloat(a.price.replace('$', ''));
-        const priceB = parseFloat(b.price.replace('$', ''));
+        const priceA = a.price;
+        const priceB = b.price;
 
         switch (filters.sortBy) {
           case 'price-low':

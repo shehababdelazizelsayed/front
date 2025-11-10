@@ -1,10 +1,11 @@
 export interface Book {
-  id: number;
+  id?: string;
   title: string;
   author: string;
-  price: string;
-  genre: string;
+  price: number;
+  description?: string;
   image: string;
+  Category: string;
 }
 
 export interface CartItem extends Book {

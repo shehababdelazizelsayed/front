@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Book } from '../../models/book.model';
 import { SearchService } from '../../services/search.service';
+import { Api } from '../../services/api';
 
 @Component({
   selector: 'app-category',
@@ -36,55 +37,60 @@ export class Category implements OnInit, OnDestroy {
     { value: 'name-desc', label: 'Name: Z to A' },
   ];
 
-  protected allBooks: Book[] = [
-    {
-      id: 1,
-      title: 'The Art of Programming',
-      author: 'John Smith',
-      genre: 'Technology',
-      price: '$49.99',
-      image: '/assets/books/book1.jpg',
-    },
-    {
-      id: 2,
-      title: 'Digital Dreams',
-      author: 'Sarah Johnson',
-      genre: 'Science Fiction',
-      price: '$39.99',
-      image: '/assets/books/book2.jpg',
-    },
-    {
-      id: 3,
-      title: 'Web Development Mastery',
-      author: 'Michael Brown',
-      genre: 'Technology',
-      price: '$44.99',
-      image: '/assets/books/book3.jpg',
-    },
-    {
-      id: 4,
-      title: 'Mystery at Midnight',
-      author: 'Emily Chen',
-      genre: 'Mystery',
-      price: '$29.99',
-      image: '/assets/books/book4.jpg',
-    },
-    {
-      id: 5,
-      title: 'The Business Mind',
-      author: 'Robert Wilson',
-      genre: 'Non-Fiction',
-      price: '$54.99',
-      image: '/assets/books/book5.jpg',
-    },
-  ];
+  // protected allBooks: Book[] = [
+  //   {
+  //     id: 1,
+  //     title: 'The Art of Programming',
+  //     author: 'John Smith',
+  //     genre: 'Technology',
+  //     price: '$49.99',
+  //     image: '/assets/books/book1.jpg',
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Digital Dreams',
+  //     author: 'Sarah Johnson',
+  //     genre: 'Science Fiction',
+  //     price: '$39.99',
+  //     image: '/assets/books/book2.jpg',
+  //   },
+  //   {
+  //     id: 3,
+  //     title: 'Web Development Mastery',
+  //     author: 'Michael Brown',
+  //     genre: 'Technology',
+  //     price: '$44.99',
+  //     image: '/assets/books/book3.jpg',
+  //   },
+  //   {
+  //     id: 4,
+  //     title: 'Mystery at Midnight',
+  //     author: 'Emily Chen',
+  //     genre: 'Mystery',
+  //     price: '$29.99',
+  //     image: '/assets/books/book4.jpg',
+  //   },
+  //   {
+  //     id: 5,
+  //     title: 'The Business Mind',
+  //     author: 'Robert Wilson',
+  //     genre: 'Non-Fiction',
+  //     price: '$54.99',
+  //     image: '/assets/books/book5.jpg',
+  //   },
+  // ];
 
   protected books: Book[] = [];
+  protected allBooks: Book[] = [];
+  protected loading: boolean = false;
+  protected errorMessage: string | null = null;
   private destroy$ = new Subject<void>();
 
-  constructor(private searchService: SearchService, private route: ActivatedRoute) {}
+  constructor(private searchService: SearchService, private route: ActivatedRoute, private api: Api) { }
 
   ngOnInit() {
+
+    this.loadBooksFromApi();
     // Subscribe to search query changes
     this.searchService.searchQuery$.pipe(takeUntil(this.destroy$)).subscribe((query) => {
       this.searchQuery = query;
@@ -98,10 +104,36 @@ export class Category implements OnInit, OnDestroy {
         this.applyFilters();
       }
     });
-
-    this.books = [...this.allBooks];
   }
+  // this.books = [...this.allBooks];
 
+  private loadBooksFromApi(): void {
+    this.loading = true;
+
+    this.api.getBooks().subscribe({
+      next: (data) => {
+        console.log(' Books from API:', data);
+        const booksArray = Array.isArray(data) ? data : data.books ?? [];
+        this.allBooks = booksArray.map((book: any) => ({
+          id: book._id,
+          title: book.Title,
+          author: book.Author,
+          genre: book.Genre ?? 'Unknown',
+          price: Number(book.Price),
+          description: book.Description,
+          image: book.Image ?? '/assets/default-book.jpg',
+        }));
+
+        this.books = [...this.allBooks];
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load books:', error);
+        this.errorMessage = 'Failed to load books';
+        this.loading = false;
+      },
+    });
+  }
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();

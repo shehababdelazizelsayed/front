@@ -1,13 +1,21 @@
 import { Component, Input } from '@angular/core';
 
+// export interface Book {
+//   title: string;
+//   author: string;
+//   genre: string;
+//   price: string;
+//   image: string;
+// }
 export interface Book {
+  id?: string | number;
   title: string;
   author: string;
-  genre: string;
-  price: string;
-  image: string;
+  price: number;
+  genre?: string;
+  description?: string;
+  image?: string;
 }
-
 @Component({
   selector: 'app-book-card',
   standalone: false,

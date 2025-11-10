@@ -18,6 +18,7 @@ import { Cat } from './components/cat/cat';
 import { Footer } from './components/footer/footer';
 import { Register } from './page/register/register';
 import { Forget } from './page/forget/forget';
+import { provideHttpClient } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,7 @@ import { Forget } from './page/forget/forget';
     Forget,
   ],
   imports: [BrowserModule, CommonModule, AppRoutingModule, FormsModule, RouterModule],
-  providers: [provideBrowserGlobalErrorListeners()],
+  providers: [provideBrowserGlobalErrorListeners(), provideHttpClient()],
   bootstrap: [App],
 })
-export class AppModule {}
+export class AppModule { }
