@@ -3,8 +3,7 @@ import { Api } from '../../services/api';
 import { Router } from '@angular/router';
 
 interface RegisterForm {
-  firstName: string;
-  lastName: string;
+  Name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -19,8 +18,7 @@ interface RegisterForm {
 })
 export class Register {
   form: RegisterForm = {
-    firstName: '',
-    lastName: '',
+    Name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -38,8 +36,7 @@ export class Register {
       return;
     }
     const userData = {
-      FirstName: this.form.firstName,
-      LastName: this.form.lastName,
+      Name: this.form.Name,
       Email: this.form.email,
       Password: this.form.password,
     };
