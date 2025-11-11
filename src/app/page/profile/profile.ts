@@ -110,6 +110,9 @@ export class Profile implements AfterViewInit {
 
   setActiveTab(tab: string) {
     this.activeTab = tab;
+    if (tab === 'orders' && this.orders.length === 0) {
+      this.fetchOrders();
+    }
   }
 
   saveProfile() {
@@ -134,7 +137,18 @@ export class Profile implements AfterViewInit {
   fetchOrders() {
     this.api.getOrders().subscribe({
       next: (res: any) => {
-        this.orders = Array.isArray(res.orders) ? res.orders : res;
+        const list = Array.isArray(res) ? res : Array.isArray(res.orders) ? res.orders : [];
+        this.orders = list.map((o: any) => ({
+          id: o._id,
+          number: o._id ? String(o._id).slice(-6) : '',
+          date: o.createdAt ? new Date(o.createdAt).toLocaleString() : '',
+          status: o.Status || o.status || 'pending',
+          items: Array.isArray(o.Books)
+            ? o.Books.reduce((sum: number, it: any) => sum + (it.Quantity || 0), 0)
+            : 0,
+          total: o.TotalPrice || o.total || 0,
+          raw: o,
+        }));
       },
       error: (err: any) => {
         this.error = err?.error?.message || 'Failed to load orders';
