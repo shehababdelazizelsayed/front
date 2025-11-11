@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Book } from '../../components/book-card/book-card';
+import { Book } from '../../models/book.model';
 import { Api } from '../../services/api';
-
 
 @Component({
   selector: 'app-home',
@@ -9,14 +8,12 @@ import { Api } from '../../services/api';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-
-
 export class HomeComponent {
   featuredBooks: Book[] = [];
   loading = false;
   errorMessage = '';
 
-  constructor(private api: Api) { }
+  constructor(private api: Api) {}
 
   ngOnInit(): void {
     this.fetchBooks();
@@ -27,7 +24,6 @@ export class HomeComponent {
 
     this.api.DisplayHome().subscribe({
       next: (response) => {
-
         this.featuredBooks = response.books.map((b: any) => ({
           id: b._id,
           title: b.Title,
@@ -37,7 +33,6 @@ export class HomeComponent {
           description: b.Description,
           image: b.Image || 'assets/books/default.jpg',
         }));
-
 
         this.loading = false;
       },

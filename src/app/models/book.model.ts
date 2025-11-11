@@ -6,6 +6,8 @@ export interface Book {
   description?: string;
   image: string;
   Category: string;
+  genre?: string; // For backward compatibility
+  BookId: string;
 }
 
 export interface CartItem extends Book {

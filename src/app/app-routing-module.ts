@@ -7,6 +7,8 @@ import { Cart } from './page/cart/cart';
 import { Login } from './page/login/login';
 import { Register } from './page/register/register';
 import { Forget } from './page/forget/forget';
+import { Product } from './page/product/product';
+import { Success } from './page/success/success';
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
@@ -16,6 +18,11 @@ const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'forget', component: Forget },
+  { path: 'product/:id', component: Product },
+  {
+    path: 'success',
+    loadComponent: () => import('./page/success/success').then((m) => m.Success),
+  },
 ];
 
 @NgModule({

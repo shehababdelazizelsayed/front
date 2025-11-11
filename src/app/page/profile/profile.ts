@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Api } from '../../services/api';
 import * as bootstrap from 'bootstrap';
 import { AfterViewInit } from '@angular/core';
 
@@ -20,12 +21,31 @@ export class Profile implements AfterViewInit {
   twoFactorPhone = '';
 
   profile = {
-    firstName: 'shehab',
-    lastName: 'abdelaziz',
-    email: 'shehab@gmail.com',
-    phone: '01023323888',
-    Role: 'User',
+    name: '',
+    email: '',
+    Role: '',
+    id: '',
   };
+  jwtPayload: any = null;
+  error: string = '';
+  constructor(private api: Api) {
+    this.loadProfileFromJWT();
+  }
+
+  loadProfileFromJWT() {
+    const token = localStorage.getItem('jwt');
+    if (!token) return;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      this.jwtPayload = payload;
+      this.profile.name = payload.Name || payload.name || '';
+      this.profile.email = payload.Email || payload.email || '';
+      this.profile.Role = payload.Role || payload.role || '';
+      this.profile.id = payload.id || payload._id || '';
+    } catch (e) {
+      this.error = 'Invalid token';
+    }
+  }
 
   currentPassword = '';
   newPassword = '';
@@ -58,49 +78,28 @@ export class Profile implements AfterViewInit {
       alert('New password and confirm password do not match.');
       return;
     }
-
-    const toastEl = document.getElementById('passwordToast');
-    if (toastEl) {
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
-
+    this.error = '';
+    this.api
+      .updateUserProfile({
+        CurrentPassword: this.currentPassword,
+        NewPassword: this.newPassword,
+        ConfirmPassword: this.confirmPassword,
+      })
+      .subscribe({
+        next: (result: any) => {
+          if (result.user) {
+            this.profile.name = result.user.Name || this.profile.name;
+            this.profile.email = result.user.Email || this.profile.email;
+            this.profile.Role = result.user.Role || this.profile.Role;
+          }
+          this.error = '';
+        },
+        error: (err: any) => {
+          this.error = err?.error?.message || 'Password update failed';
+        },
+      });
     this.closeModal();
   }
-
-  orders = [
-    {
-      id: 1,
-      number: 'ORD-1234',
-      date: 'Jan 11, 2024',
-      status: 'Delivered',
-      items: 3,
-      total: 84.97,
-    },
-    {
-      id: 2,
-      number: 'ORD-2234',
-      date: 'Jan 12, 2024',
-      status: 'Delivered',
-      items: 3,
-      total: 84.97,
-    },
-    {
-      id: 3,
-      number: 'ORD-3234',
-      date: 'Jan 13, 2024',
-      status: 'Delivered',
-      items: 3,
-      total: 84.97,
-    },
-  ];
-
-  wishlistItems = [
-    { id: 1, title: 'Book Title 1', author: 'Author Name', price: '$24.99' },
-    { id: 2, title: 'Book Title 2', author: 'Author Name', price: '$24.99' },
-    { id: 3, title: 'Book Title 3', author: 'Author Name', price: '$24.99' },
-    { id: 4, title: 'Book Title 4', author: 'Author Name', price: '$24.99' },
-  ];
 
   notifications = {
     email: true,
@@ -114,8 +113,35 @@ export class Profile implements AfterViewInit {
   }
 
   saveProfile() {
-    console.log('Profile saved:', this.profile);
+    this.error = '';
+    this.api.updateUserProfile({ Name: this.profile.name }).subscribe({
+      next: (result: any) => {
+        if (result.user) {
+          this.profile.name = result.user.Name || this.profile.name;
+          this.profile.email = result.user.Email || this.profile.email;
+          this.profile.Role = result.user.Role || this.profile.Role;
+        }
+        this.error = '';
+      },
+      error: (err: any) => {
+        this.error = err?.error?.message || 'Update failed';
+      },
+    });
   }
+
+  orders: any[] = [];
+
+  fetchOrders() {
+    this.api.getOrders().subscribe({
+      next: (res: any) => {
+        this.orders = Array.isArray(res.orders) ? res.orders : res;
+      },
+      error: (err: any) => {
+        this.error = err?.error?.message || 'Failed to load orders';
+      },
+    });
+  }
+
   openTwoFactorModal() {
     this.twoFactorModal?.show();
   }

@@ -92,7 +92,7 @@
                         </button>
                       </div>
                       <p class="fs-4 fw-bold text-primary-custom mb-0">
-                      ${{ (item.price * item.quantity).toFixed(2) }}
+                        ${{ (item.price * item.quantity).toFixed(2) }}
                       </p>
                     </div>
                   </div>
@@ -132,7 +132,7 @@
                 <span class="display-6 fw-bold text-primary-custom">${{ total.toFixed(2) }}</span>
               </div>
 
-              <a routerLink="/checkout" class="btn btn-primary w-100 btn-lg mb-4">
+              <a (click)="proceedToCheckout()" class="btn btn-primary w-100 btn-lg mb-4">
                 Proceed to Checkout
               </a>
 

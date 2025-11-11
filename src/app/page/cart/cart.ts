@@ -1,51 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CartItem } from '../../models/book.model';
 import { Api } from '../../services/api';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-cart',
   standalone: false,
   templateUrl: './cart.html',
-  styleUrl: './cart.css',
+  styleUrls: ['./cart.css'],
 })
 export class Cart implements OnInit {
   cartItems: CartItem[] = [];
   loading = false;
   errorMessage = '';
-  // ngOnInit(): void {
-  //   throw new Error('Method not implemented.');
-  // }
+  cartId: string = '';
 
-  // cartItems: CartItem[] = [
-  //   {
-  //     id: 1,
-  //     title: 'Midnight Tales',
-  //     author: 'Elena Rivers',
-  //     price: '$24.99',
-  //     quantity: 1,
-  //     image: 'assets/book-1.jpg',
-  //     genre: 'Fiction',
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'The Last Echo',
-  //     author: 'Marcus Stone',
-  //     price: '$29.99',
-  //     quantity: 2,
-  //     image: 'assets/book-2.jpg',
-  //     genre: 'Mystery',
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'Beyond Horizons',
-  //     author: 'Sarah Chen',
-  //     price: '$19.99',
-  //     quantity: 1,
-  //     image: 'assets/book-3.jpg',
-  //     genre: 'Adventure',
-  //   },
-  // ];
-  constructor(private api: Api) { }
+  constructor(private api: Api) {}
 
   ngOnInit(): void {
     this.loadCartItems();
@@ -53,14 +23,20 @@ export class Cart implements OnInit {
 
   loadCartItems(): void {
     this.loading = true;
-
     this.api.getCartItems().subscribe({
-      next: (response) => {
-        console.log('Cart items from API:', response);
-        // Assuming API returns { items: [...] }
-        this.cartItems = response.items.map((item) => ({
-          ...item,
-          price: Number(item.price),
+      next: (response: any) => {
+        const cart = response.Cart || response.cart || {};
+        this.cartId = cart._id || '';
+        const items = Array.isArray(cart.Items) ? cart.Items : [];
+        this.cartItems = items.map((item: any) => ({
+          id: item._id,
+          title: item.Book?.Title || '',
+          BookId: item.Book?._id || '',
+          author: '',
+          price: Number(item.Book?.Price) || 0,
+          image: item.Book?.Image || '',
+          Category: item.Book?.Category || '',
+          quantity: item.Quantity || 1,
         }));
         this.loading = false;
       },
@@ -91,58 +67,57 @@ export class Cart implements OnInit {
   updateQuantity(item: CartItem, delta: number) {
     const newQuantity = Math.max(1, item.quantity + delta);
 
-    this.api.updateCartItem(item.id!, newQuantity).subscribe({
+    this.api.updateCartItem(item.BookId!, newQuantity).subscribe({
       next: () => {
         item.quantity = newQuantity;
       },
       error: (err) => {
-        console.error(' Error updating quantity:', err);
+        console.error('Error updating quantity:', err);
       },
     });
   }
 
   removeItem(item: CartItem) {
-    this.api.removeFromCart(item.id!).subscribe({
+    this.api.removeFromCart(item.BookId!).subscribe({
       next: () => {
-        this.cartItems = this.cartItems.filter((i) => i.id !== item.id);
+        this.cartItems = this.cartItems.filter((i) => i.BookId !== item.BookId);
       },
       error: (err) => {
-        console.error(' Error removing item:', err);
+        console.error('Error removing item:', err);
       },
     });
   }
+
+  async proceedToCheckout() {
+    const token = localStorage.getItem('jwt');
+
+    if (!this.cartId) {
+      alert('Cart not loaded or empty.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${environment.apiUrl}/payment/create-payment-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ CartId: this.cartId }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        if (data.sessionId || data.session_id) {
+          const sessionId = data.sessionId || data.session_id;
+          localStorage.setItem('stripe_session_id', sessionId);
+        }
+        window.location.href = data.url;
+      } else {
+        console.error('No checkout URL returned:', data);
+        alert('Failed to start checkout.');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('Failed to proceed to checkout.');
+    }
+  }
 }
-//   get subtotal(): number {
-//     return this.cartItems.reduce((sum, item) => {
-//       const price = parseFloat(item.price.replace('$', ''));
-//       return sum + price * item.quantity;
-//     }, 0);
-//   }
-
-//   get shipping(): number {
-//     return 5.99;
-//   }
-
-//   get tax(): number {
-//     return this.subtotal * 0.08;
-//   }
-
-//   get total(): number {
-//     return this.subtotal + this.shipping + this.tax;
-//   }
-
-//   updateQuantity(item: CartItem, delta: number) {
-//     item.quantity = Math.max(1, item.quantity + delta);
-//   }
-
-//   removeItem(item: CartItem) {
-//     const index = this.cartItems.indexOf(item);
-//     if (index > -1) {
-//       this.cartItems.splice(index, 1);
-//     }
-//   }
-
-//   protected parsePrice(price: string): number {
-//     return parseFloat(price.replace('$', ''));
-//   }
-// }

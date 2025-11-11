@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Api } from '../../services/api';
 import { Router } from '@angular/router';
 
 interface RegisterForm {
@@ -26,15 +27,31 @@ export class Register {
     agreeToTerms: false,
   };
 
-  constructor(private router: Router) {}
+  constructor(private api: Api, private router: Router) {}
+
+  error = '';
 
   onSubmit() {
+    this.error = '';
     if (this.form.password !== this.form.confirmPassword) {
-      console.error('Passwords do not match');
+      this.error = 'Passwords do not match';
       return;
     }
-    // TODO: Implement registration logic
-    console.log('Form submitted:', this.form);
+    const userData = {
+      FirstName: this.form.firstName,
+      LastName: this.form.lastName,
+      Email: this.form.email,
+      Password: this.form.password,
+    };
+    (this as any).api.registerUser(userData).subscribe({
+      next: (response: any) => {
+        // Registration successful, redirect to login
+        this.router.navigate(['/login']);
+      },
+      error: (err: any) => {
+        this.error = err?.error?.message || 'Registration failed';
+      },
+    });
   }
 
   navigateToLogin() {

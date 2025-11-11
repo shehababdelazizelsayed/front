@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { Book } from './components/book-card/book-card';
+import { Book } from './models/book.model';
 // import './app.css';
 
 @Component({

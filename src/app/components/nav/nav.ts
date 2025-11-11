@@ -10,6 +10,14 @@ import { Subject } from 'rxjs';
   styleUrl: './nav.css',
 })
 export class Nav implements OnDestroy {
+  onProfileClick() {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      this.router.navigate(['/profile']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
   isSearchActive = false;
   searchQuery = '';
   private destroy$ = new Subject<void>();

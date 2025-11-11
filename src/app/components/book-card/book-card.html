@@ -6,31 +6,69 @@
   <div class="book-card-overlay"></div>
 
   <div class="book-card-content">
-    <span class="genre-badge">{{ book.genre }}</span>
+    <span class="genre-badge">{{ book.Category }}</span>
     <h3 class="h5 fw-bold mb-1">{{ book.title }}</h3>
     <p class="text-muted-custom small mb-3">{{ book.author }}</p>
     <div class="d-flex align-items-center justify-content-between">
-      <span class="fs-4 fw-bold text-accent">{{ book.price }}</span>
-      <button class="btn btn-accent btn-sm d-flex align-items-center gap-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+      <span class="fs-4 fw-bold text-accent">${{ book.price }}</span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-accent btn-sm" (click)="viewProduct()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+        <button
+          class="btn btn-accent btn-sm d-flex align-items-center"
+          (click)="addToCart()"
+          [disabled]="addingToCart"
+          [class.btn-success]="addedToCart"
         >
-          <circle cx="8" cy="21" r="1" />
-          <circle cx="19" cy="21" r="1" />
-          <path
-            d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
-          />
-        </svg>
-        Add
-      </button>
+          <svg
+            *ngIf="!addedToCart"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="8" cy="21" r="1" />
+            <circle cx="19" cy="21" r="1" />
+            <path
+              d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+            />
+          </svg>
+          <svg
+            *ngIf="addedToCart"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          {{ addingToCart ? 'Adding...' : addedToCart ? 'Added!' : 'Add' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

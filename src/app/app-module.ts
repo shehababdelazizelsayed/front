@@ -19,6 +19,7 @@ import { Footer } from './components/footer/footer';
 import { Register } from './page/register/register';
 import { Forget } from './page/forget/forget';
 import { provideHttpClient } from '@angular/common/http';
+import { Product } from './page/product/product';
 
 @NgModule({
   declarations: [
@@ -35,9 +36,10 @@ import { provideHttpClient } from '@angular/common/http';
     Footer,
     Register,
     Forget,
+    Product,
   ],
   imports: [BrowserModule, CommonModule, AppRoutingModule, FormsModule, RouterModule],
   providers: [provideBrowserGlobalErrorListeners(), provideHttpClient()],
   bootstrap: [App],
 })
-export class AppModule { }
+export class AppModule {}

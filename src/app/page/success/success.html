@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="./success.css" />
+<div class="success-page pt-5">
+  <div *ngIf="verifying" class="verifying">
+    <h2>Verifying your payment…</h2>
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="verified && !verifying" class="verified">
+    <h1 class="title">✅ Payment Successful!</h1>
+    <p class="subtitle">Thank you — your order was placed successfully.</p>
+
+    <div class="order-meta" *ngIf="orderId || amount">
+      <p *ngIf="orderId"><strong>Order ID:</strong> {{ orderId }}</p>
+      <p *ngIf="amount"><strong>Amount:</strong> ${{ amount }}</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" (click)="goHome()">Continue Shopping</button>
+      <button class="btn secondary" (click)="goToOrders()">View Orders</button>
+    </div>
+  </div>
+
+  <!-- When there is no session id in URL let user paste one manually -->
+  <div *ngIf="!sessionId && !verifying && !verified" class="manual-verify">
+    <h2>No session id found</h2>
+    <p>
+      If you were redirected from the payment provider but the session id is missing from the URL,
+      paste the session id below (often labeled <code>session_id</code>) and click Verify.
+    </p>
+
+    <div
+      class="manual-input"
+      style="
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <input
+        [(ngModel)]="manualSessionId"
+        placeholder="paste session id here"
+        style="
+          min-width: 320px;
+          padding: 0.5rem;
+          border-radius: 6px;
+          border: 1px solid #444;
+          background: #111;
+          color: #fff;
+        "
+      />
+      <button
+        class="btn primary"
+        (click)="verifyPayment(manualSessionId)"
+        [disabled]="!manualSessionId.trim()"
+      >
+        Verify
+      </button>
+    </div>
+
+    <div style="margin-top: 1rem; text-align: center">
+      <button class="btn secondary" (click)="goHome()">Back to Home</button>
+      <button class="btn" (click)="goToOrders()">Check Orders</button>
+    </div>
+  </div>
+
+  <div *ngIf="failed && !verifying" class="failed">
+    <h1 class="title error">❌ Payment Not Verified</h1>
+    <p class="subtitle">
+      We couldn't confirm the payment. If you were charged, please contact support and provide your
+      payment reference.
+    </p>
+    <div class="actions">
+      <button class="btn secondary" (click)="goHome()">Back to Home</button>
+      <button class="btn primary" (click)="goToOrders()">Check Orders</button>
+    </div>
+  </div>
+</div>

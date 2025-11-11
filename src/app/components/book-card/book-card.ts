@@ -1,21 +1,8 @@
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { Book } from '../../models/book.model';
+import { Api } from '../../services/api';
 
-// export interface Book {
-//   title: string;
-//   author: string;
-//   genre: string;
-//   price: string;
-//   image: string;
-// }
-export interface Book {
-  id?: string | number;
-  title: string;
-  author: string;
-  price: number;
-  genre?: string;
-  description?: string;
-  image?: string;
-}
 @Component({
   selector: 'app-book-card',
   standalone: false,
@@ -24,8 +11,34 @@ export interface Book {
 })
 export class BookCard {
   @Input() book!: Book;
+  addingToCart = false;
+  addedToCart = false;
+
+  constructor(private router: Router, private api: Api) {}
 
   protected addToCart() {
-    console.log('Adding to cart:', this.book.title);
+    if (!this.book?.id || this.addingToCart) return;
+
+    this.addingToCart = true;
+    this.api.addBookToCart(this.book.id, 1).subscribe({
+      next: () => {
+        this.addedToCart = true;
+        this.addingToCart = false;
+        // Reset the added indicator after 2 seconds
+        setTimeout(() => {
+          this.addedToCart = false;
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.addingToCart = false;
+        alert('Failed to add item to cart.');
+      },
+    });
+  }
+
+  protected viewProduct() {
+    if (this.book.id) {
+      this.router.navigate(['/product', this.book.id]);
+    }
   }
 }
