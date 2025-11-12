@@ -1,0 +1,52 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Admin: Manage Books</h2>
+
+  <div class="mb-3 d-flex gap-2">
+    <input type="text" [(ngModel)]="newBookTitle" class="form-control w-25" placeholder="Book title" />
+    <input type="text" [(ngModel)]="newBookAuthor" class="form-control w-25" placeholder="Author" />
+    <button class="btn btn-success" (click)="addBook()">Add Book</button>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center mt-3">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <table *ngIf="!isLoading" class="table table-bordered table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let book of books; index as i">
+        <td>{{ i + 1 }}</td>
+        <td>{{ book.Title }}</td>
+        <td>{{ book.Author }}</td>
+        <td>
+          <span class="badge" [ngClass]="{
+              'bg-success': book.Status === 'approved',
+              'bg-warning': book.Status === 'pending',
+              'bg-danger': book.Status === 'rejected'
+            }">
+            {{ book.Status }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-success me-1" (click)="approveBook(book._id)">
+            Approve
+          </button>
+          <button class="btn btn-sm btn-warning me-1" (click)="rejectBook(book._id)">
+            Reject
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="deleteBook(book._id)">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

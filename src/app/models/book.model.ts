@@ -6,7 +6,7 @@ export interface Book {
   description?: string;
   image: string;
   Category: string;
-  genre?: string; // For backward compatibility
+  genre?: string;
   BookId: string;
 }
 

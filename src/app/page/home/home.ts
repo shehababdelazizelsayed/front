@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Book } from '../../models/book.model';
 import { Api } from '../../services/api';
+import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-home',

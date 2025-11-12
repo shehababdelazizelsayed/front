@@ -27,7 +27,7 @@ export class Api {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
   }
   getCartItems(): Observable<{ items: CartItem[] }> {
@@ -111,7 +111,7 @@ export class Api {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
   }
 
@@ -139,5 +139,52 @@ export class Api {
 
   removeFromWishlist(bookId: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/wishlist/${bookId}`);
+  }
+  // ---------- Admin Book Management ----------
+
+  getAllBooksForAdmin(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/Admin/Books`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  addBookAsAdmin(book: any): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.post(`${this.baseUrl}/Admin/Books`, book, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  updateBookAsAdmin(bookId: string, bookData: any): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.put(`${this.baseUrl}/Admin/Books/${bookId}`, bookData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  deleteBookAsAdmin(bookId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.delete(`${this.baseUrl}/Admin/Books/${bookId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  approveBook(bookId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.patch(
+      `${this.baseUrl}/Admin/Books/${bookId}/approve`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+  }
+
+  rejectBook(bookId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.patch(
+      `${this.baseUrl}/Admin/Books/${bookId}/reject`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
   }
 }

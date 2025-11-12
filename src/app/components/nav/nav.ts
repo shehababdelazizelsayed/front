@@ -1,15 +1,32 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SearchService } from '../../services/search.service';
 import { Subject } from 'rxjs';
+import { AuthService } from '../../services/auth';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-nav',
   standalone: false,
   templateUrl: './nav.html',
-  styleUrl: './nav.css',
+  styleUrls: ['./nav.css'],
 })
-export class Nav implements OnDestroy {
+export class Nav implements OnInit, OnDestroy {
+  isAdmin = false;
+  isSearchActive = false;
+  searchQuery = '';
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private router: Router,
+    private searchService: SearchService,
+    private AuthService: AuthService,
+  ) {}
+
+  // Detect admin status once component initializes
+  ngOnInit(): void {
+    this.isAdmin = this.AuthService.isAdmin();
+  }
+
   onProfileClick() {
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
@@ -18,16 +35,10 @@ export class Nav implements OnDestroy {
       this.router.navigate(['/login']);
     }
   }
-  isSearchActive = false;
-  searchQuery = '';
-  private destroy$ = new Subject<void>();
-
-  constructor(private router: Router, private searchService: SearchService) {}
 
   toggleSearch() {
     this.isSearchActive = !this.isSearchActive;
 
-    // When closing search, reset query & also clear it from the URL
     if (!this.isSearchActive) {
       this.searchQuery = '';
       this.searchService.updateSearchQuery('');
@@ -56,17 +67,11 @@ export class Nav implements OnDestroy {
 
   onSearchEnter() {
     const search = this.searchQuery.trim();
-
-    // Update search in the service
     this.searchService.updateSearchQuery(search);
-
-    // Navigate to /category with query param
     this.router.navigate(['/category'], {
-      queryParams: { search: search || null }, // clears param if empty
+      queryParams: { search: search || null },
       queryParamsHandling: 'merge',
     });
-
-    // Optionally close the search bar
     this.isSearchActive = false;
   }
 

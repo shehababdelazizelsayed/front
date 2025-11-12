@@ -23,6 +23,10 @@ const routes: Routes = [
     path: 'success',
     loadComponent: () => import('./page/success/success').then((m) => m.Success),
   },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin-module/admin-module').then((m) => m.AdminModule),
+  },
 ];
 
 @NgModule({

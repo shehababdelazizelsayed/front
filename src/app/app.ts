@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { Book } from './models/book.model';
 // import './app.css';
+import { ErrorService } from './services/error.service';
 
 @Component({
   selector: 'app-root',
@@ -41,4 +41,9 @@ export class App {
   //     image: '/assets/books/book4.jpg',
   //   },
   // ];
+  constructor(private errorService: ErrorService) {}
+
+  ngOnInit() {
+    setTimeout(() => this.errorService.show('Test popup works ✅'), 1000);
+  }
 }
