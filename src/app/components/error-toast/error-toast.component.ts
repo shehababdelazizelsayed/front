@@ -6,6 +6,7 @@ import { ErrorService } from '../../services/error.service';
   selector: 'app-error-toast',
   standalone: false,
   templateUrl: './error-toast.component.html',
+  styleUrls: ['./error-toast.css'],
 })
 export class ErrorToastComponent implements OnInit, OnDestroy {
   message = '';
@@ -14,7 +15,7 @@ export class ErrorToastComponent implements OnInit, OnDestroy {
   constructor(
     private errorService: ErrorService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.sub = this.errorService.error$.subscribe((msg) => {

@@ -41,9 +41,7 @@ export class App {
   //     image: '/assets/books/book4.jpg',
   //   },
   // ];
-  constructor(private errorService: ErrorService) {}
+  constructor(private errorService: ErrorService) { }
 
-  ngOnInit() {
-    setTimeout(() => this.errorService.show('Test popup works ✅'), 1000);
-  }
+
 }

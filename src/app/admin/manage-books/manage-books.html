@@ -1,11 +1,24 @@
-<div class="container mt-4">
+<div class="container mt-5 pt-4">
   <h2 class="mb-3">Admin: Manage Books</h2>
 
   <div class="mb-3 d-flex gap-2">
-    <input type="text" [(ngModel)]="newBookTitle" class="form-control w-25" placeholder="Book title" />
-    <input type="text" [(ngModel)]="newBookAuthor" class="form-control w-25" placeholder="Author" />
-    <button class="btn btn-success" (click)="addBook()">Add Book</button>
-  </div>
+  <input
+    type="text"
+    [(ngModel)]="searchTitle"
+    class="form-control w-25"
+    placeholder="Search by title"
+    (input)="filterBooks()"
+  />
+
+  <input
+    type="text"
+    [(ngModel)]="searchAuthor"
+    class="form-control w-25"
+    placeholder="Search by author"
+    (input)="filterBooks()"
+  />
+</div>
+
 
   <div *ngIf="isLoading" class="text-center mt-3">
     <div class="spinner-border text-primary" role="status"></div>

@@ -20,11 +20,12 @@ export class Nav implements OnInit, OnDestroy {
     private router: Router,
     private searchService: SearchService,
     private AuthService: AuthService,
-  ) {}
+  ) { }
 
   // Detect admin status once component initializes
-  ngOnInit(): void {
+  ngOnInit() {
     this.isAdmin = this.AuthService.isAdmin();
+    console.log("IS ADMIN?", this.isAdmin);
   }
 
   onProfileClick() {

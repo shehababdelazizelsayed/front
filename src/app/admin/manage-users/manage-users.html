@@ -1,9 +1,14 @@
-<div class="container mt-4">
-  <h2 class="mb-3">Manage Users</h2>
+<div class="container mt-7">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Manage Users</h2>
+   
+  </div>
 
-  <button class="btn btn-primary mb-3">Add User</button>
+  <div *ngIf="isLoading" class="text-center my-3">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
 
-  <table class="table table-bordered table-striped">
+  <table *ngIf="!isLoading" class="table table-bordered table-striped mt-5">
     <thead class="table-light">
       <tr>
         <th>#</th>
@@ -13,15 +18,33 @@
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
-      <tr>
-        <td>1</td>
-        <td>Ahmed</td>
-        <td>ahmed@example.com</td>
-        <td>Admin</td>
+      <tr *ngFor="let user of users; index as i">
+        <td>{{ i + 1 }}</td>
+        <td>{{ user.Name }}</td>
+        <td>{{ user.Email }}</td>
+
         <td>
-          <button class="btn btn-sm btn-warning me-2">Edit</button>
-          <button class="btn btn-sm btn-danger">Delete</button>
+          <select
+            #roleSel
+            class="form-select form-select-sm"
+            [value]="user.Role"
+            (change)="changeRole(user._id, roleSel.value)"
+          >
+            <option>User</option>
+            <option>Owner</option>
+            <option>Admin</option>
+          </select>
+        </td>
+
+        <td>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="deleteUser(user._id)"
+          >
+            Delete
+          </button>
         </td>
       </tr>
     </tbody>

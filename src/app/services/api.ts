@@ -58,7 +58,7 @@ export class Api {
   }
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getBooks(): Observable<any> {
     return this.http.get(`${this.baseUrl}/Books?limit=12`);
@@ -151,21 +151,21 @@ export class Api {
 
   addBookAsAdmin(book: any): Observable<any> {
     const token = localStorage.getItem('jwt');
-    return this.http.post(`${this.baseUrl}/Admin/Books`, book, {
+    return this.http.post(`${this.baseUrl}/Books`, book, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
 
   updateBookAsAdmin(bookId: string, bookData: any): Observable<any> {
     const token = localStorage.getItem('jwt');
-    return this.http.put(`${this.baseUrl}/Admin/Books/${bookId}`, bookData, {
+    return this.http.put(`${this.baseUrl}/Books/${bookId}`, bookData, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
 
   deleteBookAsAdmin(bookId: string): Observable<any> {
     const token = localStorage.getItem('jwt');
-    return this.http.delete(`${this.baseUrl}/Admin/Books/${bookId}`, {
+    return this.http.delete(`${this.baseUrl}/Books/${bookId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
@@ -173,7 +173,7 @@ export class Api {
   approveBook(bookId: string): Observable<any> {
     const token = localStorage.getItem('jwt');
     return this.http.patch(
-      `${this.baseUrl}/Admin/Books/${bookId}/approve`,
+      `${this.baseUrl}/Books/${bookId}/approve`,
       {},
       { headers: { Authorization: `Bearer ${token}` } },
     );
@@ -182,9 +182,38 @@ export class Api {
   rejectBook(bookId: string): Observable<any> {
     const token = localStorage.getItem('jwt');
     return this.http.patch(
-      `${this.baseUrl}/Admin/Books/${bookId}/reject`,
+      `${this.baseUrl}/Books/${bookId}/reject`,
       {},
       { headers: { Authorization: `Bearer ${token}` } },
+    );
+  }
+  getAllUsersForAdmin(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/Admin/Users`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  getUserByIdForAdmin(userId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/Admin/Users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  deleteUserAsAdmin(userId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.delete(`${this.baseUrl}/Admin/Users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  changeUserRoleAsAdmin(userId: string, role: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.patch(
+      `${this.baseUrl}/Admin/Users/role/${userId}`,
+      { Role: role },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
   }
 }

@@ -1,28 +1,46 @@
-<div class="container mt-4">
+<div class="container mt-5">
   <h2 class="mb-3">Manage Orders</h2>
 
-  <table class="table table-bordered table-striped">
+  <div *ngIf="isLoading" class="text-center my-3">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <table *ngIf="!isLoading" class="table table-bordered table-striped">
     <thead class="table-light">
       <tr>
         <th>#</th>
-        <th>User</th>
-        <th>Book</th>
-        <th>Date</th>
+        <th>User ID</th>
+        <th>Book ID</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
         <th>Status</th>
-        <th>Actions</th>
+        <th>Date</th>
       </tr>
     </thead>
+
     <tbody>
-      <tr>
-        <td>1</td>
-        <td>Ahmed</td>
-        <td>Book Title</td>
-        <td>2025-11-12</td>
-        <td>Pending</td>
+      <tr *ngFor="let order of orders; index as i">
+        <td>{{ i + 1 }}</td>
+        <td>{{ order.User }}</td>
+
+        
+        <td>{{ order.Books?.[0]?.BookId }}</td>
+
+        <td>{{ order.Books?.[0]?.Quantity }}</td>
+        <td>{{ order.TotalPrice }}</td>
+
         <td>
-          <button class="btn btn-sm btn-success me-2">Approve</button>
-          <button class="btn btn-sm btn-danger">Reject</button>
+          <span class="badge"
+            [ngClass]="{
+              'bg-success': order.Status === 'completed',
+              'bg-warning': order.Status === 'pending',
+              'bg-danger': order.Status === 'rejected'
+            }">
+            {{ order.Status }}
+          </span>
         </td>
+
+        <td>{{ order.CreatedAt | date: 'yyyy-MM-dd' }}</td>
       </tr>
     </tbody>
   </table>

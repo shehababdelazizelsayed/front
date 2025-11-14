@@ -9,11 +9,16 @@ import { Api } from '../../services/api';
 })
 export class ManageBooks implements OnInit {
   books: any[] = [];
+  originalBooks: any[] = [];
+
+  searchTitle = '';
+  searchAuthor = '';
+
   newBookTitle = '';
   newBookAuthor = '';
   isLoading = false;
 
-  constructor(private api: Api) {}
+  constructor(private api: Api) { }
 
   ngOnInit(): void {
     this.loadBooks();
@@ -21,15 +26,28 @@ export class ManageBooks implements OnInit {
 
   loadBooks() {
     this.isLoading = true;
+
     this.api.getAllBooksForAdmin().subscribe({
       next: (res) => {
-        this.books = res;
+        this.originalBooks = res.books || [];
+        this.books = [...this.originalBooks];
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading books:', err);
         this.isLoading = false;
       },
+    });
+  }
+
+  filterBooks() {
+    const title = this.searchTitle.toLowerCase();
+    const author = this.searchAuthor.toLowerCase();
+
+    this.books = this.originalBooks.filter(book => {
+      const matchesTitle = book.Title.toLowerCase().includes(title);
+      const matchesAuthor = book.Author.toLowerCase().includes(author);
+      return matchesTitle && matchesAuthor;
     });
   }
 
