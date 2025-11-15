@@ -18,17 +18,17 @@ export class Category implements OnInit, OnDestroy {
   protected selectedPrice: string = 'all';
   protected searchQuery: string = '';
 
-  protected categories: string[] = [
-    'all',
-    'Fiction',
-    'Non-Fiction',
-    'Science Fiction',
-    'Mystery',
-    'Romance',
-    'Technology',
-  ];
+  // Pagination properties
+  protected currentPage: number = 1;
+  protected itemsPerPage: number = 12;
+  protected totalBooks: number = 0;
+  protected totalPages: number = 0;
 
-  protected priceRanges: string[] = ['all', 'under-15', '15-30', '30-50', 'over-50'];
+  // categories and priceRanges will be populated dynamically from API response
+  protected categories: string[] = ['all'];
+
+  // price range keys: template knows how to render these specific keys
+  protected priceRanges: string[] = ['all'];
   protected sortOptions = [
     { value: 'newest', label: 'Newest' },
     { value: 'price-low', label: 'Price: Low to High' },
@@ -81,16 +81,22 @@ export class Category implements OnInit, OnDestroy {
   // ];
 
   protected books: Book[] = [];
+  // Full filtered list (un-paginated) used as source for pagination slicing
+  protected filteredFull: Book[] = [];
   protected allBooks: Book[] = [];
   protected loading: boolean = false;
   protected errorMessage: string | null = null;
   private destroy$ = new Subject<void>();
 
-  constructor(private searchService: SearchService, private route: ActivatedRoute, private api: Api) { }
+  constructor(
+    private searchService: SearchService,
+    private route: ActivatedRoute,
+    private api: Api
+  ) {}
 
   ngOnInit() {
-
     this.loadBooksFromApi();
+
     // Subscribe to search query changes
     this.searchService.searchQuery$.pipe(takeUntil(this.destroy$)).subscribe((query) => {
       this.searchQuery = query;
@@ -104,6 +110,23 @@ export class Category implements OnInit, OnDestroy {
         this.applyFilters();
       }
     });
+
+    // Single subscription to filteredBooks$ - keeps pagination source stable and avoids
+    // repeated subscriptions which can cause unexpected behavior.
+    this.searchService.filteredBooks$.pipe(takeUntil(this.destroy$)).subscribe((filteredBooks) => {
+      this.filteredFull = filteredBooks || [];
+      console.debug(
+        '[Category] filteredBooks$ emitted, count =',
+        this.filteredFull.length,
+        this.filteredFull.slice(0, 3)
+      );
+      this.totalBooks = this.filteredFull.length;
+      this.totalPages = Math.ceil(this.totalBooks / this.itemsPerPage) || 1;
+      // Ensure current page is within bounds
+      if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
+      if (this.currentPage < 1) this.currentPage = 1;
+      this.updatePaginatedBooks();
+    });
   }
   // this.books = [...this.allBooks];
 
@@ -116,15 +139,47 @@ export class Category implements OnInit, OnDestroy {
         const booksArray = Array.isArray(data) ? data : data.books ?? [];
         this.allBooks = booksArray.map((book: any) => ({
           id: book._id,
+          BookId: book._id ?? book.BookId ?? '',
           title: book.Title,
           author: book.Author,
-          genre: book.Genre ?? 'Unknown',
+          // keep legacy `Category` field (used by filters) and also `genre`
+          Category: book.Category ?? book.Genre ?? 'Unknown',
+          genre: book.Genre ?? book.Category ?? 'Unknown',
           price: Number(book.Price),
           description: book.Description,
           image: book.Image ?? '/assets/default-book.jpg',
         }));
 
+        // Build dynamic category list from API data (preserve casing for display)
+        const uniqueCats = Array.from(
+          new Set(this.allBooks.map((b) => b.Category || b.genre || 'Unknown'))
+        ).filter((c) => c && c.toLowerCase() !== 'all');
+        uniqueCats.sort((a, b) => a.localeCompare(b));
+        this.categories = ['all', ...uniqueCats];
+
+        // Build dynamic price ranges based on where books fall.
+        const buckets: { key: string; test: (p: number) => boolean }[] = [
+          { key: 'under-15', test: (p) => p < 15 },
+          { key: '15-30', test: (p) => p >= 15 && p <= 30 },
+          { key: '30-50', test: (p) => p > 30 && p <= 50 },
+          { key: 'over-50', test: (p) => p > 50 },
+        ];
+
+        const presentBuckets = buckets.filter((b) =>
+          this.allBooks.some((book) => b.test(Number(book.price)))
+        );
+        this.priceRanges = ['all', ...presentBuckets.map((b) => b.key)];
+
+        console.debug(
+          '[Category] computed categories:',
+          this.categories,
+          'priceRanges:',
+          this.priceRanges
+        );
+
+        // Initialize filtered list and pagination immediately after loading
         this.books = [...this.allBooks];
+        this.applyFilters();
         this.loading = false;
       },
       error: (error) => {
@@ -140,6 +195,8 @@ export class Category implements OnInit, OnDestroy {
   }
 
   protected applyFilters() {
+    // Just instruct the service to compute filteredBooks; the single subscription
+    // in ngOnInit will receive the new list and update pagination.
     this.searchService.filterBooks(this.allBooks, {
       query: this.searchQuery,
       category: this.selectedCategory,
@@ -147,9 +204,52 @@ export class Category implements OnInit, OnDestroy {
       sortBy: this.selectedSort,
     });
 
-    this.searchService.filteredBooks$.pipe(takeUntil(this.destroy$)).subscribe((filteredBooks) => {
-      this.books = filteredBooks;
-    });
+    // Reset to first page whenever filters change
+    this.currentPage = 1;
+  }
+
+  protected updatePaginatedBooks() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    // Slice from the full filtered list to avoid double-slicing
+    this.books = this.filteredFull.slice(startIndex, endIndex);
+  }
+
+  protected goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      // Update paginated view from the already-subscribed full filtered list
+      this.updatePaginatedBooks();
+    }
+  }
+
+  protected previousPage() {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
+    }
+  }
+
+  protected nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
+  }
+
+  protected getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
 
   protected onCategoryChange(category: string) {

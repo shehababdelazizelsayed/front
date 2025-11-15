@@ -1,0 +1,50 @@
+<button class="chat-button" (click)="toggleChat()">
+  <span>{{ isChatOpen ? '✕' : '💬' }}</span>
+</button>
+
+<div class="chat-container" *ngIf="isChatOpen">
+  <div class="cc-box">
+    <div class="cc-box-header clearfix">
+      AI Assistant
+      <span class="status-indicator" [ngClass]="'status-' + statusType">{{ statusText }}</span>
+      <span class="pull-right" title="Close" (click)="closeChat()">✕</span>
+    </div>
+
+    <div class="cc-tab-container">
+      <div class="cc-tab selected">CHAT</div>
+    </div>
+
+    <div class="cc-search-bar">
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search messages..."
+        (keyup)="searchMessages($event)"
+      />
+    </div>
+
+    <div class="content-area">
+      <div class="chat-messages" #chatMessages>
+        <div
+          *ngFor="let msg of messages"
+          [ngClass]="['message', msg.type]"
+          [hidden]="msg.hidden"
+          [innerHTML]="msg.content"
+        ></div>
+      </div>
+
+      <div class="input-area">
+        <input
+          class="chat-input"
+          type="text"
+          #questionInput
+          [(ngModel)]="question"
+          placeholder="Ask me anything..."
+          [disabled]="sendBtnDisabled"
+          (keypress)="handleEnter($event)"
+        />
+        <button class="send-btn" (click)="ask()" [disabled]="sendBtnDisabled">Send</button>
+      </div>
+    </div>
+  </div>
+</div>

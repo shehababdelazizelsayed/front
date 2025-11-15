@@ -14,90 +14,28 @@ export interface Review {
   createdAt: string;
   updatedAt: string;
 }
+
 @Injectable({
   providedIn: 'root',
 })
 export class Api {
+  private baseUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {}
+
+  // ----------------- CART -----------------
   addBookToCart(BookId: string, Qty: number = 1): Observable<any> {
     const token = localStorage.getItem('jwt');
     return this.http.post(
       `${this.baseUrl}/cart`,
       { BookId, Qty },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
   }
+
   getCartItems(): Observable<{ items: CartItem[] }> {
     const token = localStorage.getItem('jwt');
     return this.http.get<{ items: CartItem[] }>(`${this.baseUrl}/cart`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-
-  updateUserProfile(data: any): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    return this.http.patch(`${this.baseUrl}/Users/Profile`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-
-  getOrders(): Observable<any> {
-    const token = localStorage.getItem('jwt');
-    return this.http.get(`${this.baseUrl}/Orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  }
-  private baseUrl = environment.apiUrl;
-
-  constructor(private http: HttpClient) { }
-
-  getBooks(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/Books?limit=12`);
-  }
-  DisplayHome(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/Books`);
-  }
-  getBookById(id: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/Books/${id}`);
-  }
-
-  /**
-   * Verify a payment session on the backend. Returns an object containing
-   * success flag and optional order metadata.
-   */
-  verifyPaymentSession(sessionId: string): Observable<any> {
-    // Some backends expect `sessionId` while others expect `session_id`.
-    // Send both to be tolerant. Include auth header if available (some APIs
-    // may require user context to verify the session)
-    const token = localStorage.getItem('jwt');
-    const body = { sessionId, session_id: sessionId };
-    const options: any = {};
-    if (token) {
-      options.headers = { Authorization: `Bearer ${token}` };
-    }
-    return this.http.post(`${this.baseUrl}/payment/verify-session`, body, options);
-  }
-
-  registerUser(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/Users/Register`, data);
-  }
-
-  loginUser(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/Users/Login`, data);
-  }
-
-  removeFromCart(bookId: string) {
-    const token = localStorage.getItem('jwt');
-    return this.http.delete(`${this.baseUrl}/Cart/${bookId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   }
@@ -107,15 +45,71 @@ export class Api {
     return this.http.put(
       `${this.baseUrl}/Cart`,
       { BookId, Quantity },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
   }
 
-  // Review endpoints
+  removeFromCart(bookId: string) {
+    const token = localStorage.getItem('jwt');
+    return this.http.delete(`${this.baseUrl}/Cart/${bookId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  // ----------------- USER PROFILE -----------------
+  updateUserProfile(data: any): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.patch(`${this.baseUrl}/Users/Profile`, data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  // ----------------- ORDERS -----------------
+  getOrders(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/Orders`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  // ----------------- BOOKS -----------------
+  getBooks(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/Books`);
+  }
+
+  DisplayHome(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/Books?limit=4`);
+  }
+
+  getBookById(id: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/Books/${id}`);
+  }
+
+  addBook(formData: FormData): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.post(`${this.baseUrl}/Books`, formData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  // ----------------- PAYMENT -----------------
+  verifyPaymentSession(sessionId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    const body = { sessionId, session_id: sessionId };
+    const headers: any = token ? { Authorization: `Bearer ${token}` } : {};
+    return this.http.post(`${this.baseUrl}/payment/verify-session`, body, { headers });
+  }
+
+  // ----------------- AUTH -----------------
+  registerUser(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/Users/Register`, data);
+  }
+
+  loginUser(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/Users/Login`, data);
+  }
+
+  // ----------------- REVIEWS -----------------
   getReviewsByBookId(bookId: string): Observable<{ reviews: Review[] }> {
     return this.http.get<{ reviews: Review[] }>(`${this.baseUrl}/Reviews/${bookId}`);
   }
@@ -132,7 +126,7 @@ export class Api {
     return this.http.delete(`${this.baseUrl}/Review/${reviewId}`);
   }
 
-  // Wishlist endpoints
+  // ----------------- WISHLIST -----------------
   addToWishlist(bookId: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/wishlist`, { bookId });
   }
@@ -140,8 +134,17 @@ export class Api {
   removeFromWishlist(bookId: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/wishlist/${bookId}`);
   }
-  // ---------- Admin Book Management ----------
 
+  // ----------------- AI ENDPOINT -----------------
+  postAI(query: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    const headers: any = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    return this.http.post(`${this.baseUrl}/ai`, { query }, { headers });
+  }
+
+  // ----------------- ADMIN -----------------
   getAllBooksForAdmin(): Observable<any> {
     const token = localStorage.getItem('jwt');
     return this.http.get(`${this.baseUrl}/Admin/Books`, {
@@ -175,7 +178,7 @@ export class Api {
     return this.http.patch(
       `${this.baseUrl}/Books/${bookId}/approve`,
       {},
-      { headers: { Authorization: `Bearer ${token}` } },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
   }
 
@@ -184,9 +187,10 @@ export class Api {
     return this.http.patch(
       `${this.baseUrl}/Books/${bookId}/reject`,
       {},
-      { headers: { Authorization: `Bearer ${token}` } },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
   }
+
   getAllUsersForAdmin(): Observable<any> {
     const token = localStorage.getItem('jwt');
     return this.http.get(`${this.baseUrl}/Admin/Users`, {

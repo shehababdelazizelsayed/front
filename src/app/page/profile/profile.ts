@@ -18,6 +18,10 @@ export class Profile implements AfterViewInit {
   confirmDelete = false;
   private deleteModal: bootstrap.Modal | null = null;
 
+  // Order details modal
+  private orderDetailsModal: bootstrap.Modal | null = null;
+  selectedOrder: any = null;
+
   twoFactorPhone = '';
 
   profile = {
@@ -30,6 +34,59 @@ export class Profile implements AfterViewInit {
   error: string = '';
   constructor(private api: Api) {
     this.loadProfileFromJWT();
+  }
+
+  /** Helper to resolve book titles for order items when only BookId is present */
+  private resolveBookTitles(items: any[]) {
+    if (!Array.isArray(items)) return;
+    items.forEach((it) => {
+      // normalize possible id locations
+      const bookId = it?.Book?._id || it?.BookId || (typeof it?.Book === 'string' ? it.Book : null);
+      // if we already have a nested Book with Title, skip
+      if ((it?.Book && it.Book.Title) || !bookId) return;
+
+      this.api.getBookById(String(bookId)).subscribe({
+        next: (b: any) => {
+          try {
+            // prefer nested Book object
+            if (!it.Book) it.Book = {};
+            // backend may return { book: {...} } or { message, book }
+            const title =
+              b?.book?.Title ||
+              b?.book?.title ||
+              b?.data?.Title ||
+              b?.Title ||
+              b?.title ||
+              (Array.isArray(b) && b[0] && (b[0].Title || b[0].title));
+            if (title) {
+              it.Book.Title = title;
+              it._resolvedTitle = title;
+            } else {
+              console.debug('[Profile] could not resolve title for', bookId, b);
+            }
+            // also resolve price if available from the book response
+            const price =
+              b?.book?.Price ||
+              b?.book?.price ||
+              b?.Price ||
+              b?.price ||
+              b?.data?.Price ||
+              (Array.isArray(b) && b[0] && (b[0].Price || b[0].price));
+            if (price != null) {
+              // normalize to number
+              const p = Number(price);
+              it.Book.Price = p;
+              it._resolvedPrice = p;
+            }
+          } catch (e) {
+            // ignore
+          }
+        },
+        error: () => {
+          // leave as-is if fetch fails
+        },
+      });
+    });
   }
 
   loadProfileFromJWT() {
@@ -64,6 +121,9 @@ export class Profile implements AfterViewInit {
     }
     const deleteEl = document.getElementById('deleteAccountModal');
     if (deleteEl) this.deleteModal = new bootstrap.Modal(deleteEl, { backdrop: 'static' });
+    const orderDetailsEl = document.getElementById('orderDetailsModal');
+    if (orderDetailsEl)
+      this.orderDetailsModal = new bootstrap.Modal(orderDetailsEl, { backdrop: 'static' });
   }
 
   openModal() {
@@ -215,5 +275,121 @@ export class Profile implements AfterViewInit {
     }
 
     console.warn('User account deleted!');
+  }
+
+  /** Open order details modal and set selected order */
+  openOrderDetails(order: any) {
+    this.selectedOrder = order;
+    // Resolve book titles for items that only contain BookId
+    this.resolveBookTitles(this.selectedOrder.raw?.Books || []);
+    // Ensure we have freshest data: if raw not present, fetch single order? For now use raw
+    this.orderDetailsModal?.show();
+  }
+
+  closeOrderDetails() {
+    this.selectedOrder = null;
+    this.orderDetailsModal?.hide();
+  }
+  logout() {
+    localStorage.removeItem('jwt');
+    window.location.href = '/';
+  }
+
+  // Upload book properties
+  uploadForm = {
+    Title: '',
+    Author: '',
+    Price: 0,
+    Description: '',
+    Stock: 0,
+    Category: '',
+    image: null as File | null,
+    pdf: null as File | null,
+  };
+
+  uploadError: string = '';
+  uploadSuccess: string = '';
+  isUploading = false;
+
+  onFileSelected(event: any, fieldName: 'image' | 'pdf') {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadForm[fieldName] = file;
+    }
+  }
+
+  uploadBook() {
+    this.uploadError = '';
+    this.uploadSuccess = '';
+
+    // Validate form
+    if (
+      !this.uploadForm.Title ||
+      !this.uploadForm.Author ||
+      !this.uploadForm.Price ||
+      !this.uploadForm.Description ||
+      !this.uploadForm.Category
+    ) {
+      this.uploadError = 'Please fill in all required fields.';
+      return;
+    }
+
+    if (this.uploadForm.Price < 0) {
+      this.uploadError = 'Price must be a positive number.';
+      return;
+    }
+
+    if (this.uploadForm.Stock < 0) {
+      this.uploadError = 'Stock must be a non-negative number.';
+      return;
+    }
+
+    this.isUploading = true;
+
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('Title', this.uploadForm.Title);
+    formData.append('Author', this.uploadForm.Author);
+    formData.append('Price', String(this.uploadForm.Price));
+    formData.append('Description', this.uploadForm.Description);
+    formData.append('Stock', String(this.uploadForm.Stock));
+    formData.append('Category', this.uploadForm.Category);
+
+    if (this.uploadForm.image) {
+      formData.append('image', this.uploadForm.image, this.uploadForm.image.name);
+    }
+
+    if (this.uploadForm.pdf) {
+      formData.append('pdf', this.uploadForm.pdf, this.uploadForm.pdf.name);
+    }
+
+    // Call API to upload book
+    this.api.addBook(formData).subscribe({
+      next: (result: any) => {
+        this.uploadSuccess = 'Book uploaded successfully! 🎉';
+        this.isUploading = false;
+        // Reset form
+        this.uploadForm = {
+          Title: '',
+          Author: '',
+          Price: 0,
+          Description: '',
+          Stock: 0,
+          Category: '',
+          image: null,
+          pdf: null,
+        };
+        // Clear file inputs
+        const imageInput = document.getElementById('imageInput') as HTMLInputElement;
+        const pdfInput = document.getElementById('pdfInput') as HTMLInputElement;
+        if (imageInput) imageInput.value = '';
+        if (pdfInput) pdfInput.value = '';
+      },
+      error: (err: any) => {
+        this.isUploading = false;
+        const errorMsg = err?.error?.message || err?.error?.errors?.[0] || 'Upload failed';
+        this.uploadError = errorMsg;
+      },
+    });
   }
 }

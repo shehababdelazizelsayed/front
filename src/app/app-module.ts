@@ -24,6 +24,7 @@ import { Product } from './page/product/product';
 import { Profile } from './page/profile/profile';
 import { Register } from './page/register/register';
 import { GlobalErrorHandler } from './services/global-error-handler';
+import { Ai } from './components/ai/ai';
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import { GlobalErrorHandler } from './services/global-error-handler';
     Product,
     ErrorToastComponent,
     SuccessToastComponent,
+    Ai,
   ],
   imports: [
     BrowserModule,

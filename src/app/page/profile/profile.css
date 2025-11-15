@@ -1,0 +1,171 @@
+/* Upload Form Styling */
+.form-control,
+.form-select {
+  border-color: #e0e0e0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #0d82b3;
+  box-shadow: 0 0 0 0.2rem rgba(13, 130, 179, 0.15);
+}
+
+.form-label {
+  color: #333;
+}
+
+.form-label .text-danger {
+  margin-left: 4px;
+}
+
+/* File Input Enhancement */
+.input-group .form-control[type='file']::file-selector-button {
+  background-color: #0d82b3;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.input-group .form-control[type='file']::file-selector-button:hover {
+  background-color: #0a6b94;
+}
+
+/* Badge for selected files */
+.badge {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.badge.bg-success {
+  background-color: #28a745 !important;
+  color: white;
+}
+
+/* Button Styling */
+.btn-primary {
+  background-color: #0d82b3;
+  border-color: #0d82b3;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0a6b94;
+  border-color: #0a6b94;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 130, 179, 0.3);
+}
+
+.btn-primary:disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-lg {
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Alert Styling */
+.alert {
+  border-radius: 6px;
+  border: none;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.alert-danger {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.alert-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.alert .btn-close {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.alert .btn-close:hover {
+  opacity: 1;
+}
+
+/* Card Header */
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.card-header h2 {
+  color: #333;
+}
+
+.text-muted-custom {
+  color: #999;
+}
+
+/* Form Section Dividers */
+h3.fw-semibold {
+  color: #0d82b3;
+  margin-top: 24px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+/* Textarea styling */
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+textarea.form-control:focus {
+  border-color: #0d82b3;
+  box-shadow: 0 0 0 0.2rem rgba(13, 130, 179, 0.15);
+}
+
+/* Small text and icons */
+small.text-muted {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #999;
+}
+
+small.text-muted svg {
+  margin-right: 4px;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+  margin-right: 8px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .btn-lg {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  h3.fw-semibold {
+    font-size: 0.95rem;
+  }
+}
