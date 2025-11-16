@@ -21,7 +21,7 @@ export interface Review {
 export class Api {
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ----------------- CART -----------------
   addBookToCart(BookId: string, Qty: number = 1): Observable<any> {
@@ -110,20 +110,37 @@ export class Api {
   }
 
   // ----------------- REVIEWS -----------------
-  getReviewsByBookId(bookId: string): Observable<{ reviews: Review[] }> {
-    return this.http.get<{ reviews: Review[] }>(`${this.baseUrl}/Reviews/${bookId}`);
+  getReviewsByBookId(bookId: string): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.baseUrl}/Reviews/${bookId}`);
   }
 
-  addReview(review: { Book: string; Rating: number; Review: string }): Observable<Review> {
-    return this.http.post<Review>(`${this.baseUrl}/Reviews`, review);
+  addReview(reviewData: {
+    BookId: string;
+    Rating: number;
+    Review: string;
+  }): Observable<any> {
+    // backend expects BookId not Book
+    const token = localStorage.getItem('jwt');
+    return this.http.post(`${this.baseUrl}/Reviews`, reviewData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 
-  editReview(reviewId: string, review: { Rating: number; Review: string }): Observable<Review> {
-    return this.http.put<Review>(`${this.baseUrl}/Review/${reviewId}`, review);
+  editReview(
+    reviewId: string,
+    data: { Rating?: number; Review?: string }
+  ): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.put(`${this.baseUrl}/Review/${reviewId}`, data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 
   deleteReview(reviewId: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/Review/${reviewId}`);
+    const token = localStorage.getItem('jwt');
+    return this.http.delete(`${this.baseUrl}/Review/${reviewId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 
   // ----------------- WISHLIST -----------------
