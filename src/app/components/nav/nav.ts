@@ -25,7 +25,6 @@ export class Nav implements OnInit, OnDestroy {
   // Detect admin status once component initializes
   ngOnInit() {
     this.isAdmin = this.AuthService.isAdmin();
-    console.log("IS ADMIN?", this.isAdmin);
   }
 
   onProfileClick() {
@@ -68,11 +67,14 @@ export class Nav implements OnInit, OnDestroy {
 
   onSearchEnter() {
     const search = this.searchQuery.trim();
+
     this.searchService.updateSearchQuery(search);
-    this.router.navigate(['/category'], {
-      queryParams: { search: search || null },
-      queryParamsHandling: 'merge',
-    });
+
+    this.router.navigate(['/category'],
+      {
+        queryParams: { search: search || null },
+        queryParamsHandling: 'merge',
+      });
     this.isSearchActive = false;
   }
 

@@ -21,7 +21,7 @@ export interface Review {
 export class Api {
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // ----------------- CART -----------------
   addBookToCart(BookId: string, Qty: number = 1): Observable<any> {
@@ -114,11 +114,7 @@ export class Api {
     return this.http.get<Review[]>(`${this.baseUrl}/Reviews/${bookId}`);
   }
 
-  addReview(reviewData: {
-    BookId: string;
-    Rating: number;
-    Review: string;
-  }): Observable<any> {
+  addReview(reviewData: { BookId: string; Rating: number; Review: string }): Observable<any> {
     // backend expects BookId not Book
     const token = localStorage.getItem('jwt');
     return this.http.post(`${this.baseUrl}/Reviews`, reviewData, {
@@ -126,10 +122,7 @@ export class Api {
     });
   }
 
-  editReview(
-    reviewId: string,
-    data: { Rating?: number; Review?: string }
-  ): Observable<any> {
+  editReview(reviewId: string, data: { Rating?: number; Review?: string }): Observable<any> {
     const token = localStorage.getItem('jwt');
     return this.http.put(`${this.baseUrl}/Review/${reviewId}`, data, {
       headers: { Authorization: `Bearer ${token}` },
@@ -236,5 +229,56 @@ export class Api {
       { Role: role },
       { headers: { Authorization: `Bearer ${token}` } }
     );
+  }
+
+  // --------- PENDING BOOKS MANAGEMENT ---------
+  getPendingBooks(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/pending-books`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  approvePendingBook(pendingBookId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.post(
+      `${this.baseUrl}/pending-books/${pendingBookId}/approve`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
+
+  rejectPendingBook(pendingBookId: string, reason: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.post(
+      `${this.baseUrl}/pending-books/${pendingBookId}/reject`,
+      { reason },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
+
+  getUserPendingBooks(userId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/pending-books/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+  // ----------------- HERO BOOKS -----------------
+  getHeroBooks(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/hero-books`);
+  }
+
+  updateHeroBooks(bookIds: string[]): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.put(
+      `${this.baseUrl}/hero-books`,
+      { bookIds },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
+
+  // ----------------- CATEGORIES -----------------
+  getTopCategories(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/categories/top`);
   }
 }

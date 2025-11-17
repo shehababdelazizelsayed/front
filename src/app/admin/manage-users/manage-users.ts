@@ -22,7 +22,6 @@ export class ManageUsers implements OnInit {
 
     this.api.getAllUsersForAdmin().subscribe({
       next: (res) => {
-        console.log('Admin Users API Response:', res);
 
         // Force array — prevents NgFor errors
         this.users = Array.isArray(res) ? res : [];

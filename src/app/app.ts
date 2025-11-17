@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 // import './app.css';
-import { ErrorService } from './services/error.service';
 
 @Component({
   selector: 'app-root',
@@ -41,7 +40,6 @@ export class App {
   //     image: '/assets/books/book4.jpg',
   //   },
   // ];
-  constructor(private errorService: ErrorService) { }
 
 
 }

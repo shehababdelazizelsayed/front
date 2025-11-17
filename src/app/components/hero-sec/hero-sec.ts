@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Api } from '../../services/api';
 
 interface HeroBook {
-  title: string;
-  subtitle: string;
-  price: string;
-  image: string;
+  Title: string;
+  Subtitle?: string;
+  Price?: string;
+  Image: string;
 }
 
 @Component({
@@ -14,32 +15,24 @@ interface HeroBook {
   styleUrl: './hero-sec.css',
 })
 export class HeroSec implements OnInit, OnDestroy {
-  protected heroBooks: HeroBook[] = [
-    {
-      title: 'The Art of Programming',
-      subtitle: 'A Comprehensive Guide to Software Development',
-      price: '$49.99',
-      image: '/assets/books/book1.jpg',
-    },
-    {
-      title: 'Digital Dreams',
-      subtitle: 'The Future of Technology',
-      price: '$39.99',
-      image: '/assets/books/book2.jpg',
-    },
-    {
-      title: 'Web Development Mastery',
-      subtitle: 'From Beginner to Professional',
-      price: '$44.99',
-      image: '/assets/books/book3.jpg',
-    },
-  ];
+  protected heroBooks: HeroBook[] = [];
 
   protected currentSlide = 0;
   private slideInterval: any;
 
+  constructor(private api: Api) {}
+
   ngOnInit() {
-    this.startSlideShow();
+    this.api.getHeroBooks().subscribe({
+      next: (res) => {
+        this.heroBooks = res.books || [];
+        this.startSlideShow();
+      },
+      error: (err) => {
+        console.error('Failed to load hero books', err);
+        this.startSlideShow();
+      },
+    });
   }
 
   ngOnDestroy() {

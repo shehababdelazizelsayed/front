@@ -13,4 +13,4 @@ import { AdminRoutingModule } from './admin-routing-module';
   declarations: [AdminDashboard, ManageUsers, ManageBooks, ManageOrders],
   imports: [CommonModule, FormsModule, RouterModule, AdminRoutingModule],
 })
-export class AdminModule {}
+export class AdminModule { }

@@ -1,23 +1,18 @@
-// import { Injectable } from '@angular/core';
-// import { ToastrService } from 'ngx-toastr'; // Example library
+import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
-// @Injectable({
-//     providedIn: 'root'
-// })
-// export class NotificationService {
+@Injectable({
+    providedIn: 'root',
+})
+export class NotificationService {
+    constructor(private toastr: ToastrService) { }
 
-//     constructor(private toastr: ToastrService) { }
+    showSuccess(message: string, title: string = 'Success'): void {
+        this.toastr.success(message, title);
+    }
 
-//     // Shows a success message
-//     showSuccess(message: string, title: string = 'Success'): void {
-//         this.toastr.success(message, title);
-//     }
+    showError(message: string, title: string = 'Error'): void {
+        this.toastr.error(message, title);
+    }
 
-//     // Shows an error message
-//     showError(message: string, title: string = 'Error'): void {
-//         // We can add more complex logic here, e.g., parsing error objects
-//         this.toastr.error(message, title);
-//     }
-
-//     // You can add showWarning, showInfo etc.
-// }
+}

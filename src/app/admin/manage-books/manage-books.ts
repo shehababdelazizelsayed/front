@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Api } from '../../services/api';
 
+interface AdminBook {
+  _id: string;
+  Title: string;
+  Author: string;
+  Status?: string;
+}
+
 @Component({
   selector: 'app-manage-books',
   standalone: false,
@@ -8,8 +15,10 @@ import { Api } from '../../services/api';
   styleUrls: ['./manage-books.css'],
 })
 export class ManageBooks implements OnInit {
-  books: any[] = [];
-  originalBooks: any[] = [];
+  books: AdminBook[] = [];
+  originalBooks: AdminBook[] = [];
+  heroBookIds: Set<string> = new Set();
+  isSavingHeroBooks = false;
 
   searchTitle = '';
   searchAuthor = '';
@@ -22,6 +31,7 @@ export class ManageBooks implements OnInit {
 
   ngOnInit(): void {
     this.loadBooks();
+    this.loadHeroBooks();
   }
 
   loadBooks() {
@@ -34,7 +44,6 @@ export class ManageBooks implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading books:', err);
         this.isLoading = false;
       },
     });
@@ -44,7 +53,7 @@ export class ManageBooks implements OnInit {
     const title = this.searchTitle.toLowerCase();
     const author = this.searchAuthor.toLowerCase();
 
-    this.books = this.originalBooks.filter(book => {
+    this.books = this.originalBooks.filter((book) => {
       const matchesTitle = book.Title.toLowerCase().includes(title);
       const matchesAuthor = book.Author.toLowerCase().includes(author);
       return matchesTitle && matchesAuthor;
@@ -66,7 +75,8 @@ export class ManageBooks implements OnInit {
         this.newBookAuthor = '';
         this.loadBooks();
       },
-      error: (err) => console.error('Failed to add book', err),
+      error: (err) => {
+      }
     });
   }
 
@@ -88,6 +98,39 @@ export class ManageBooks implements OnInit {
     this.api.deleteBookAsAdmin(id).subscribe({
       next: () => this.loadBooks(),
       error: (err) => console.error('Failed to delete', err),
+    });
+  }
+
+  loadHeroBooks() {
+    this.api.getHeroBooks().subscribe({
+      next: (res) => {
+        this.heroBookIds = new Set((res.books || []).map((b: any) => b._id));
+      },
+      error: (err) => {
+        console.error('Error loading hero books:', err);
+      },
+    });
+  }
+
+  toggleHeroBook(bookId: string) {
+    if (this.heroBookIds.has(bookId)) {
+      this.heroBookIds.delete(bookId);
+    } else {
+      this.heroBookIds.add(bookId);
+    }
+  }
+
+  saveHeroBooks() {
+    this.isSavingHeroBooks = true;
+    this.api.updateHeroBooks(Array.from(this.heroBookIds)).subscribe({
+      next: () => {
+        this.isSavingHeroBooks = false;
+        this.loadHeroBooks();
+      },
+      error: (err) => {
+        console.error('Failed to update hero books', err);
+        this.isSavingHeroBooks = false;
+      },
     });
   }
 }

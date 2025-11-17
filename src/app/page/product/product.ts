@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Api } from '../../services/api';
-import { Book, CartItem } from '../../models/book.model';
+import { Book } from '../../models/book.model';
 import { Review } from '../../services/api';
 
 @Component({

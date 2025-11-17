@@ -4,17 +4,14 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { ErrorInterceptor } from './interceptors/error-interceptor';
-
+import { ResponsePopupInterceptor } from './interceptors/response-popup.interceptor';
 import { App } from './app';
 import { AppRoutingModule } from './app-routing-module';
 import { BookCard } from './components/book-card/book-card';
 import { Cat } from './components/cat/cat';
-import { ErrorToastComponent } from './components/error-toast/error-toast.component';
 import { Footer } from './components/footer/footer';
 import { HeroSec } from './components/hero-sec/hero-sec';
 import { Nav } from './components/nav/nav';
-import { SuccessToastComponent } from './components/success-toast/success-toast.component';
 import { Cart } from './page/cart/cart';
 import { Category } from './page/category/category';
 import { Forget } from './page/forget/forget';
@@ -25,6 +22,10 @@ import { Profile } from './page/profile/profile';
 import { Register } from './page/register/register';
 import { GlobalErrorHandler } from './services/global-error-handler';
 import { Ai } from './components/ai/ai';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Toast } from 'bootstrap';
+import { ToastrModule } from 'ngx-toastr';
+
 
 @NgModule({
   declarations: [
@@ -42,8 +43,6 @@ import { Ai } from './components/ai/ai';
     Register,
     Forget,
     Product,
-    ErrorToastComponent,
-    SuccessToastComponent,
     Ai,
   ],
   imports: [
@@ -53,11 +52,17 @@ import { Ai } from './components/ai/ai';
     HttpClientModule,
     AppRoutingModule,
     RouterModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      timeOut: 4000,
+      positionClass: 'toast-top-center',
+      preventDuplicates: true,
+    }),
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ResponsePopupInterceptor, multi: true },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
   bootstrap: [App],
 })
-export class AppModule {}
+export class AppModule { }

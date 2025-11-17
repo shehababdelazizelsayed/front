@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Book } from '../../models/book.model';
 import { Api } from '../../services/api';
-import { ErrorService } from '../../services/error.service';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +13,7 @@ export class HomeComponent {
   loading = false;
   errorMessage = '';
 
-  constructor(private api: Api) {}
+  constructor(private api: Api) { }
 
   ngOnInit(): void {
     this.fetchBooks();

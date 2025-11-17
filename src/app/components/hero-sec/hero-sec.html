@@ -8,23 +8,24 @@
     [style.transition]="'opacity 1s ease-in-out'"
   >
     <div class="position-relative">
-      <img [src]="book.image" [alt]="book.title" class="hero-image animate-float" />
+      <img [src]="book.Image" [alt]="book.Title" class="hero-image animate-float" />
     </div>
   </div>
 
   <div
+    *ngIf="heroBooks.length > 0"
     class="position-absolute bottom-0 start-50 translate-middle-x text-center mb-5 pb-5 animate-fade-in"
     style="z-index: 10"
   >
     <h2 class="display-1 fw-bold mb-3" style="letter-spacing: 0.1em">
-      {{ heroBooks[currentSlide].title }}
+      {{ heroBooks[currentSlide]?.Title }}
     </h2>
     <p class="fs-4 text-muted-custom mb-4">
-      {{ heroBooks[currentSlide].subtitle }}
+      {{ heroBooks[currentSlide]?.Subtitle }}
     </p>
     <div class="d-flex align-items-center justify-content-center gap-4">
       <span class="display-5 fw-bold text-accent">
-        {{ heroBooks[currentSlide].price }}
+        {{ heroBooks[currentSlide]?.Price }}
       </span>
       <button class="btn btn-accent btn-lg">Add to Cart</button>
     </div>

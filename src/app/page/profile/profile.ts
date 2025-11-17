@@ -366,7 +366,8 @@ export class Profile implements AfterViewInit {
     // Call API to upload book
     this.api.addBook(formData).subscribe({
       next: (result: any) => {
-        this.uploadSuccess = 'Book uploaded successfully! 🎉';
+        this.uploadSuccess =
+          'Book uploaded successfully! ✅ It is pending admin approval and will appear once approved.';
         this.isUploading = false;
         // Reset form
         this.uploadForm = {

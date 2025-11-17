@@ -1,12 +1,12 @@
 import { ErrorHandler, Injectable } from '@angular/core';
-import { ErrorService } from './error.service';
+import { NotificationService } from './notification.service';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
-  constructor(private errorService: ErrorService) {}
+  constructor(private notificationService: NotificationService) { }
 
   handleError(error: any): void {
     console.error('Global Error:', error);
-    this.errorService.show('An unexpected error occurred.');
+    this.notificationService.showError('An unexpected error occurred.');
   }
 }

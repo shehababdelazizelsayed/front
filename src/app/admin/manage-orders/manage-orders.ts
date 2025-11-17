@@ -22,14 +22,11 @@ export class ManageOrders implements OnInit {
 
     this.api.getOrders().subscribe({
       next: (res) => {
-        console.log("📌 ORDERS API RESPONSE:", res);
 
-        // تأمين الـ response بحيث ميحصلش error
         this.orders = Array.isArray(res)
           ? res
           : res.orders || [];
 
-        console.log("📌 FINAL ORDERS ARRAY:", this.orders);
 
         this.isLoading = false;
       },

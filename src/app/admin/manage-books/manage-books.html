@@ -2,28 +2,33 @@
   <h2 class="mb-3">Admin: Manage Books</h2>
 
   <div class="mb-3 d-flex gap-2">
-  <input
-    type="text"
-    [(ngModel)]="searchTitle"
-    class="form-control w-25"
-    placeholder="Search by title"
-    (input)="filterBooks()"
-  />
+    <input
+      type="text"
+      [(ngModel)]="searchTitle"
+      class="form-control w-25"
+      placeholder="Search by title"
+      (input)="filterBooks()"
+    />
 
-  <input
-    type="text"
-    [(ngModel)]="searchAuthor"
-    class="form-control w-25"
-    placeholder="Search by author"
-    (input)="filterBooks()"
-  />
-</div>
-
+    <input
+      type="text"
+      [(ngModel)]="searchAuthor"
+      class="form-control w-25"
+      placeholder="Search by author"
+      (input)="filterBooks()"
+    />
+  </div>
 
   <div *ngIf="isLoading" class="text-center mt-3">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
 
+  <form (submit)="$event.preventDefault(); saveHeroBooks()" class="mb-3">
+    <button type="submit" class="btn btn-primary" [disabled]="isSavingHeroBooks">
+      Save Hero Section Books
+      <span *ngIf="isSavingHeroBooks" class="spinner-border spinner-border-sm ms-2"></span>
+    </button>
+  </form>
   <table *ngIf="!isLoading" class="table table-bordered table-striped">
     <thead class="table-light">
       <tr>
@@ -31,6 +36,7 @@
         <th>Title</th>
         <th>Author</th>
         <th>Status</th>
+        <th>Hero Section</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -40,24 +46,26 @@
         <td>{{ book.Title }}</td>
         <td>{{ book.Author }}</td>
         <td>
-          <span class="badge" [ngClass]="{
+          <span
+            class="badge"
+            [ngClass]="{
               'bg-success': book.Status === 'approved',
               'bg-warning': book.Status === 'pending',
               'bg-danger': book.Status === 'rejected'
-            }">
+            }"
+          >
             {{ book.Status }}
           </span>
         </td>
         <td>
-          <button class="btn btn-sm btn-success me-1" (click)="approveBook(book._id)">
-            Approve
-          </button>
-          <button class="btn btn-sm btn-warning me-1" (click)="rejectBook(book._id)">
-            Reject
-          </button>
-          <button class="btn btn-sm btn-danger" (click)="deleteBook(book._id)">
-            Delete
-          </button>
+          <input
+            type="checkbox"
+            [checked]="heroBookIds.has(book._id)"
+            (change)="toggleHeroBook(book._id)"
+          />
+        </td>
+        <td>
+          <button class="btn btn-sm btn-danger" (click)="deleteBook(book._id)">Delete</button>
         </td>
       </tr>
     </tbody>

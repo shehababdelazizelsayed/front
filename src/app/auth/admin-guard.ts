@@ -1,39 +1,22 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
+import { AuthService } from '../services/auth';
 
-interface JwtPayload {
-  Role?: string;
-  [key: string]: any;
-}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminGuard implements CanActivate {
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+    private authService: AuthService
+  ) { }
 
   canActivate(): boolean {
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-      this.router.navigate(['/']);
-      return false;
+    if (this.authService.isAdmin()) {
+      return true;
     }
 
-    try {
-      const decoded: JwtPayload = jwtDecode(token);
-      const userRole = decoded.Role;
-
-      if (userRole === 'admin') {
-        return true;
-      } else {
-        this.router.navigate(['/']);
-        return false;
-      }
-    } catch (error) {
-      console.error('Invalid JWT', error);
-      this.router.navigate(['/']);
-      return false;
-    }
+    this.router.navigate(['/']);
+    return false;
   }
 }

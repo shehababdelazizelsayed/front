@@ -9,6 +9,7 @@ import { Register } from './page/register/register';
 import { Forget } from './page/forget/forget';
 import { Product } from './page/product/product';
 import { Success } from './page/success/success';
+import { AdminGuard } from './auth/admin-guard';
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
   },
   {
     path: 'admin',
+    canActivate: [AdminGuard],
     loadChildren: () => import('./admin/admin-module/admin-module').then((m) => m.AdminModule),
   },
 ];
