@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://your-aws-domain.com/api'
+    apiUrl: 'http://98.81.29.175:5000/api'
 };
