@@ -292,14 +292,6 @@ export class Profile implements AfterViewInit {
 
 
 
-
-
-
-
-
-
-
-
   /** Open order details modal and set selected order */
   openOrderDetails(order: any) {
     this.selectedOrder = order;
