@@ -12,17 +12,19 @@ import { AfterViewInit } from '@angular/core';
 export class Profile implements AfterViewInit {
   activeTab = 'profile';
 
-  private twoFactorModal: bootstrap.Modal | null = null;
-  isTwoFactorEnabled = false;
 
-  confirmDelete = false;
-  private deleteModal: bootstrap.Modal | null = null;
+
+
 
   // Order details modal
   private orderDetailsModal: bootstrap.Modal | null = null;
   selectedOrder: any = null;
 
-  twoFactorPhone = '';
+  // My Books modal
+  private myBooksModal: bootstrap.Modal | null = null;
+  selectedBook: any = null;
+
+
 
   profile = {
     name: '',
@@ -115,15 +117,14 @@ export class Profile implements AfterViewInit {
     if (modalEl) {
       this.modal = new bootstrap.Modal(modalEl, { backdrop: 'static' });
     }
-    const twoFactorEl = document.getElementById('twoFactorModal');
-    if (twoFactorEl) {
-      this.twoFactorModal = new bootstrap.Modal(twoFactorEl, { backdrop: 'static' });
-    }
-    const deleteEl = document.getElementById('deleteAccountModal');
-    if (deleteEl) this.deleteModal = new bootstrap.Modal(deleteEl, { backdrop: 'static' });
+
+
     const orderDetailsEl = document.getElementById('orderDetailsModal');
     if (orderDetailsEl)
       this.orderDetailsModal = new bootstrap.Modal(orderDetailsEl, { backdrop: 'static' });
+    const myBooksEl = document.getElementById('myBooksDetailsModal');
+    if (myBooksEl)
+      this.myBooksModal = new bootstrap.Modal(myBooksEl, { backdrop: 'static' });
   }
 
   openModal() {
@@ -173,6 +174,9 @@ export class Profile implements AfterViewInit {
     if (tab === 'orders' && this.orders.length === 0) {
       this.fetchOrders();
     }
+    if (tab === 'mybooks' && this.userBooks.length === 0) {
+      this.fetchUserBooks();
+    }
   }
 
   saveProfile() {
@@ -194,20 +198,25 @@ export class Profile implements AfterViewInit {
 
   orders: any[] = [];
 
+  // My Books properties
+  userBooks: any[] = [];
+  userBooksLoading = false;
+  userBooksError = '';
+
   fetchOrders() {
     this.api.getOrders().subscribe({
       next: (res: any) => {
         const list = Array.isArray(res) ? res : Array.isArray(res.orders) ? res.orders : [];
-        this.orders = list.map((o: any) => ({
-          id: o._id,
-          number: o._id ? String(o._id).slice(-6) : '',
-          date: o.createdAt ? new Date(o.createdAt).toLocaleString() : '',
-          status: o.Status || o.status || 'pending',
-          items: Array.isArray(o.Books)
-            ? o.Books.reduce((sum: number, it: any) => sum + (it.Quantity || 0), 0)
+        this.orders = list.map((order: any) => ({
+          id: order._id,
+          number: order._id ? String(order._id).slice(-6) : '',
+          date: order.createdAt ? new Date(order.createdAt).toLocaleString() : '',
+          status: order.Status || order.status || 'pending',
+          items: Array.isArray(order.Books)
+            ? order.Books.reduce((sum: number, it: any) => sum + (it.Quantity || 0), 0)
             : 0,
-          total: o.TotalPrice || o.total || 0,
-          raw: o,
+          total: order.TotalPrice || order.total || 0,
+          raw: order,
         }));
       },
       error: (err: any) => {
@@ -216,66 +225,80 @@ export class Profile implements AfterViewInit {
     });
   }
 
-  openTwoFactorModal() {
-    this.twoFactorModal?.show();
+  fetchUserBooks() {
+    this.userBooksLoading = true;
+    this.userBooksError = '';
+    this.api.getUserBooks().subscribe({
+      next: (res: any) => {
+        this.userBooksLoading = false;
+        const booksList = Array.isArray(res) ? res : Array.isArray(res.books) ? res.books : [];
+        this.userBooks = booksList.map((b: any) => ({
+          id: b._id || b.BookId,
+          title: b.Title || 'Untitled',
+          author: b.Author || 'Unknown',
+          description: b.Description || '',
+          image: b.Image || '',
+          pdf: b.Pdf || '',
+          category: b.Category || '',
+          price: b.Price || 0,
+          raw: b,
+        }));
+      },
+      error: (err: any) => {
+        this.userBooksLoading = false;
+        this.userBooksError = err?.error?.message || 'Failed to load your books';
+      },
+    });
   }
 
-  closeTwoFactorModal() {
-    this.twoFactorModal?.hide();
+  openBookDetails(book: any) {
+    this.selectedBook = book;
+    this.myBooksModal?.show();
   }
 
-  enableTwoFactor() {
-    if (!this.twoFactorPhone) {
-      alert('Please enter a valid phone number.');
-      return;
+  closeBookDetails() {
+    this.selectedBook = null;
+    this.myBooksModal?.hide();
+  }
+
+  downloadBook(bookPdfUrl: string, bookTitle: string) {
+    if (bookPdfUrl) {
+      const link = document.createElement('a');
+      link.href = bookPdfUrl;
+      link.download = `${bookTitle}.pdf`;
+      link.click();
+
+      // Show download notification
+      const toastEl = document.getElementById('passwordToast');
+      if (toastEl) {
+        toastEl.querySelector('.toast-body')!.textContent =
+          `Downloading "${bookTitle}"...`;
+        toastEl.classList.add('text-bg-success');
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+      }
+    } else {
+      // Show error if no PDF available
+      const toastEl = document.getElementById('passwordToast');
+      if (toastEl) {
+        toastEl.querySelector('.toast-body')!.textContent = 'PDF not available for this book.';
+        toastEl.classList.remove('text-bg-success');
+        toastEl.classList.add('text-bg-warning');
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+      }
     }
-
-    this.isTwoFactorEnabled = true;
-    this.closeTwoFactorModal();
-
-    const toastEl = document.getElementById('passwordToast');
-    if (toastEl) {
-      toastEl.querySelector('.toast-body')!.textContent = '✅ Two-Factor Authentication enabled!';
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
   }
 
-  disableTwoFactor() {
-    this.isTwoFactorEnabled = false;
-    this.closeTwoFactorModal();
 
-    const toastEl = document.getElementById('passwordToast');
-    if (toastEl) {
-      toastEl.querySelector('.toast-body')!.textContent = '❌ Two-Factor Authentication disabled.';
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
-  }
 
-  openDeleteModal() {
-    this.confirmDelete = false;
-    this.deleteModal?.show();
-  }
 
-  closeDeleteModal() {
-    this.deleteModal?.hide();
-  }
 
-  deleteAccount() {
-    this.closeDeleteModal();
 
-    const toastEl = document.getElementById('passwordToast');
-    if (toastEl) {
-      toastEl.querySelector('.toast-body')!.textContent = '💀 Account deleted successfully.';
-      toastEl.classList.remove('text-bg-success');
-      toastEl.classList.add('text-bg-danger');
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    }
 
-    console.warn('User account deleted!');
-  }
+
+
+
 
   /** Open order details modal and set selected order */
   openOrderDetails(order: any) {
@@ -367,7 +390,7 @@ export class Profile implements AfterViewInit {
     this.api.addBook(formData).subscribe({
       next: (result: any) => {
         this.uploadSuccess =
-          'Book uploaded successfully! ✅ It is pending admin approval and will appear once approved.';
+          'Book uploaded successfully! It is pending admin approval and will appear once approved.';
         this.isUploading = false;
         // Reset form
         this.uploadForm = {

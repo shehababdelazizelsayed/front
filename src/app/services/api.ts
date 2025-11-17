@@ -21,7 +21,7 @@ export interface Review {
 export class Api {
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ----------------- CART -----------------
   addBookToCart(BookId: string, Qty: number = 1): Observable<any> {
@@ -280,5 +280,13 @@ export class Api {
   // ----------------- CATEGORIES -----------------
   getTopCategories(): Observable<any> {
     return this.http.get(`${this.baseUrl}/categories/top`);
+  }
+
+  // ----------------- USER'S BOOKS -----------------
+  getUserBooks(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/Users/my-books`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 }
