@@ -70,19 +70,7 @@ export class ManageBooks implements OnInit {
     });
   }
 
-  approveBook(id: string) {
-    this.api.approveBook(id).subscribe({
-      next: () => this.loadBooks(),
-      error: (err) => console.error('Failed to approve', err),
-    });
-  }
 
-  rejectBook(id: string) {
-    this.api.rejectBook(id).subscribe({
-      next: () => this.loadBooks(),
-      error: (err) => console.error('Failed to reject', err),
-    });
-  }
 
   deleteBook(id: string) {
     this.api.deleteBookAsAdmin(id).subscribe({

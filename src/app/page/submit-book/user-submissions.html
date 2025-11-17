@@ -1,0 +1,38 @@
+<div class="user-submissions-container">
+  <h2>My Book Submissions</h2>
+
+  <div *ngIf="pendingBooks.length === 0" class="no-submissions">
+    <p>You haven't submitted any books for approval yet.</p>
+    <a routerLink="/submit-book" class="btn btn-primary">Submit a Book</a>
+  </div>
+
+  <div *ngIf="pendingBooks.length > 0" class="submissions-list">
+    <div *ngFor="let book of pendingBooks" class="submission-card">
+      <div class="submission-header">
+        <h3>{{ book.Title }}</h3>
+        <span class="status status-{{ book.Status }}">{{ book.Status }}</span>
+      </div>
+
+      <div class="submission-details">
+        <p><strong>Author:</strong> {{ book.Author }}</p>
+        <p><strong>Category:</strong> {{ book.Category }}</p>
+        <p><strong>Price:</strong> ${{ book.Price }}</p>
+        <p><strong>Submitted:</strong> {{ book.SubmittedAt | date:'medium' }}</p>
+
+        <div *ngIf="book.Status === 'approved'" class="status-info">
+          <p><strong>Approved At:</strong> {{ book.ReviewedAt | date:'medium' }}</p>
+          <p *ngIf="book.AdminComment"><strong>Admin Comment:</strong> {{ book.AdminComment }}</p>
+        </div>
+
+        <div *ngIf="book.Status === 'rejected'" class="status-info">
+          <p><strong>Rejected At:</strong> {{ book.ReviewedAt | date:'medium' }}</p>
+          <p *ngIf="book.AdminComment"><strong>Admin Comment:</strong> {{ book.AdminComment }}</p>
+        </div>
+
+        <div *ngIf="book.Status === 'pending'" class="status-info">
+          <p>Your book is currently under review by our administrators.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

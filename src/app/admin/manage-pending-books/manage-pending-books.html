@@ -1,0 +1,98 @@
+<div class="manage-pending-books-container">
+  <h2>Manage Pending Books</h2>
+
+  <div *ngIf="isLoading" class="loading">
+    <p>Loading pending books...</p>
+  </div>
+
+  <div *ngIf="!isLoading && pendingBooks.length === 0" class="no-books">
+    <p>No pending books to review.</p>
+  </div>
+
+  <div *ngIf="!isLoading && pendingBooks.length > 0" class="books-list">
+    <div *ngFor="let book of pendingBooks" class="book-card">
+      <div class="book-header">
+        <div class="book-info">
+          <h3>{{ book.Title }}</h3>
+          <p class="author">by {{ book.Author }}</p>
+        </div>
+        <div class="book-meta">
+          <p><strong>Submitted:</strong> {{ book.SubmittedAt | date:'medium' }}</p>
+          <p><strong>Owner:</strong> {{ book.Owner?.Name }} ({{ book.Owner?.Email }})</p>
+        </div>
+      </div>
+
+      <div class="book-details">
+        <div class="detail-row">
+          <span><strong>Category:</strong> {{ book.Category }}</span>
+          <span><strong>Price:</strong> ${{ book.Price }}</span>
+          <span><strong>Stock:</strong> {{ book.Stock }}</span>
+        </div>
+
+        <div class="description">
+          <strong>Description:</strong>
+          <p>{{ book.Description }}</p>
+        </div>
+
+        <div class="files" *ngIf="book.Image || book.Pdf">
+          <strong>Files:</strong>
+          <div class="file-links">
+            <a *ngIf="book.Image" [href]="book.Image" target="_blank" class="file-link">View Image</a>
+            <a *ngIf="book.Pdf" [href]="book.Pdf" target="_blank" class="file-link">View PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-actions">
+        <button
+          class="btn btn-approve"
+          (click)="approveBook(book._id)"
+          [disabled]="processingBook === book._id"
+        >
+          <span *ngIf="processingBook !== book._id">Approve</span>
+          <span *ngIf="processingBook === book._id">Approving...</span>
+        </button>
+
+        <button
+          class="btn btn-reject"
+          (click)="openRejectModal(book)"
+          [disabled]="processingBook === book._id"
+        >
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Modal -->
+  <div *ngIf="showRejectModal" class="modal-overlay" (click)="closeRejectModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Reject Book Submission</h3>
+      <p><strong>Book:</strong> {{ selectedBook?.Title }}</p>
+      <p><strong>Author:</strong> {{ selectedBook?.Author }}</p>
+
+      <div class="form-group">
+        <label for="rejectComment">Rejection Reason (Required):</label>
+        <textarea
+          id="rejectComment"
+          [(ngModel)]="rejectComment"
+          placeholder="Please provide a reason for rejection..."
+          rows="4"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeRejectModal()">Cancel</button>
+        <button
+          class="btn btn-reject"
+          (click)="rejectBook()"
+          [disabled]="!rejectComment.trim() || processingBook === selectedBook?._id"
+        >
+          <span *ngIf="processingBook !== selectedBook?._id">Confirm Reject</span>
+          <span *ngIf="processingBook === selectedBook?._id">Rejecting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,155 @@
+<div class="submit-book-container">
+  <h2>Submit Book for Approval</h2>
+
+  <form #bookForm="ngForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="title">Title *</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        [(ngModel)]="bookData.title"
+        required
+        #title="ngModel"
+        class="form-control"
+        placeholder="Enter book title"
+      />
+      <div *ngIf="title.invalid && title.touched" class="error-message">
+        Title is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="author">Author *</label>
+      <input
+        type="text"
+        id="author"
+        name="author"
+        [(ngModel)]="bookData.author"
+        required
+        #author="ngModel"
+        class="form-control"
+        placeholder="Enter author name"
+      />
+      <div *ngIf="author.invalid && author.touched" class="error-message">
+        Author is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="price">Price *</label>
+      <input
+        type="number"
+        id="price"
+        name="price"
+        [(ngModel)]="bookData.price"
+        required
+        min="0"
+        step="0.01"
+        #price="ngModel"
+        class="form-control"
+        placeholder="Enter price"
+      />
+      <div *ngIf="price.invalid && price.touched" class="error-message">
+        Valid price is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category *</label>
+      <select
+        id="category"
+        name="category"
+        [(ngModel)]="bookData.category"
+        required
+        #category="ngModel"
+        class="form-control"
+      >
+        <option value="">Select a category</option>
+        <option value="Fiction">Fiction</option>
+        <option value="Non-Fiction">Non-Fiction</option>
+        <option value="Science">Science</option>
+        <option value="Technology">Technology</option>
+        <option value="History">History</option>
+        <option value="Biography">Biography</option>
+        <option value="Romance">Romance</option>
+        <option value="Mystery">Mystery</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="Other">Other</option>
+      </select>
+      <div *ngIf="category.invalid && category.touched" class="error-message">
+        Category is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="stock">Stock</label>
+      <input
+        type="number"
+        id="stock"
+        name="stock"
+        [(ngModel)]="bookData.stock"
+        min="0"
+        class="form-control"
+        placeholder="Enter stock quantity (optional)"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description *</label>
+      <textarea
+        id="description"
+        name="description"
+        [(ngModel)]="bookData.description"
+        required
+        #description="ngModel"
+        class="form-control"
+        rows="4"
+        placeholder="Enter book description"
+      ></textarea>
+      <div *ngIf="description.invalid && description.touched" class="error-message">
+        Description is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="image">Book Image</label>
+      <input
+        type="file"
+        id="image"
+        name="image"
+        (change)="onImageSelected($event)"
+        accept="image/*"
+        class="form-control"
+      />
+      <small class="form-text">Upload a cover image for the book (optional)</small>
+    </div>
+
+    <div class="form-group">
+      <label for="pdf">Book PDF</label>
+      <input
+        type="file"
+        id="pdf"
+        name="pdf"
+        (change)="onPdfSelected($event)"
+        accept=".pdf"
+        class="form-control"
+      />
+      <small class="form-text">Upload the book PDF file (optional)</small>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        [disabled]="!bookForm.valid || isSubmitting"
+        class="btn btn-primary"
+      >
+        <span *ngIf="isSubmitting">Submitting...</span>
+        <span *ngIf="!isSubmitting">Submit for Approval</span>
+      </button>
+      <button type="button" (click)="resetForm()" class="btn btn-secondary">
+        Reset
+      </button>
+    </div>
+  </form>
+</div>

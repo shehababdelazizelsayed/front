@@ -220,4 +220,44 @@ export class Api {
       { headers: { Authorization: `Bearer ${token}` } }
     );
   }
+
+  // ----------------- PENDING BOOKS -----------------
+  getPendingBooksForAdmin(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/pending-books/admin`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  approvePendingBook(bookId: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.patch(
+      `${this.baseUrl}/pending-books/${bookId}/approve`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
+
+  rejectPendingBook(bookId: string, comment: string): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.patch(
+      `${this.baseUrl}/pending-books/${bookId}/reject`,
+      { adminComment: comment },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  }
+
+  submitPendingBook(formData: FormData): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.post(`${this.baseUrl}/pending-books`, formData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
+
+  getUserPendingBooks(): Observable<any> {
+    const token = localStorage.getItem('jwt');
+    return this.http.get(`${this.baseUrl}/pending-books/user`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  }
 }
